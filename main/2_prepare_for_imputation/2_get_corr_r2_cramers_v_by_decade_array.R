@@ -21,7 +21,7 @@ do_string <- function(x) {
 	eval(parse(text=x), envir=parent.frame())
 }
 
-load("Data/cleaned_data/cleaned_data_step_5.Rdata") # returns data as d
+load("main/1_clean_data/cleaned_data_step_5.Rdata") # returns data as d
 
 # Variables to include (not counting all the decade interactions)
 imp_vars <- c("year", "serial", "pernum",
