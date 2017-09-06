@@ -1,9 +1,7 @@
-AI <- Sys.getenv("PBS_ARRAY_INDEX")
+AI <- tail(commandArgs(), 1)
 NAI <- as.numeric(AI)
 
 A_YEAR <- seq(1970, 2010, 10)[NAI]
-
-setwd("../")
 
 # Get full corr matrix and Cramer's V matrix
 library(data.table)
@@ -65,7 +63,7 @@ d[grepl("^Self-employed", classwly), classwly := "Self-employed"]
 d[ , classwly := as.factor(classwly)]
 
 # Load info on which variables should be transformed
-tform <- as.matrix(read.csv("main/2_prepare_for_imputation/variable_distributions/variable_transformations.csv", row.names=1))
+tform <- as.matrix(read.csv("main/2_prepare_for_imputation/1_variable_distributions/variable_transformations.csv", row.names=1))
 needs_transform <- tform[ , NAI]
 needs_transform["other_inc"] <- "y"
 
@@ -168,9 +166,11 @@ factor_analysis_vars <- names(d)[intersect(which(sapply(d, is.factor)), which(na
 
 # Get corr matrix, r-squared matrix, and Cramer's V matrix
 
+out_dir <- "main/2_prepare_for_imputation/"
 
 # Corr list
-if(!file.exists(dss("2_corr_list_%s.Rdata", A_YEAR))) {
+corr_file <- file.path(out_dir, sprintf("2_corr_list_%d.Rdata", A_YEAR))
+if(!file.exists(corr_file)) {
 
 	corr_list <- vector(mode="list", length=length(quant_analysis_vars))
 	names(corr_list) <- quant_analysis_vars
@@ -181,7 +181,7 @@ if(!file.exists(dss("2_corr_list_%s.Rdata", A_YEAR))) {
 		}
 		corr_list[[v]] <- cor(y, d[ , setdiff(quant_analysis_vars, v), with=FALSE], use="pairwise")
 	}
-	save(corr_list, file=dss("2_corr_list_%s.Rdata", A_YEAR))
+	save(corr_list, file=corr_file)
 	rm(corr_list)
 
 }
@@ -189,8 +189,8 @@ if(!file.exists(dss("2_corr_list_%s.Rdata", A_YEAR))) {
 
 
 # R-squared for race, educ, hispan, and sex
-
-if(!file.exists(dss("2_new_r_squared_mtrx_%s.Rdata", A_YEAR))) {
+rsq_file <- file.path(out_dir, sprintf("2_new_r_squared_mtrx_%d.Rdata", A_YEAR))
+if(!file.exists(rsq_file)) {
 
 	get_r_squared <- function(yname, xname) {
 		try(return(do_string(dss("summary(lm(%s ~ %s, data=d))$r.squared", c(yname, xname)))))
@@ -201,14 +201,15 @@ if(!file.exists(dss("2_new_r_squared_mtrx_%s.Rdata", A_YEAR))) {
 	r_squared_mtrx <- t(outer(quant_analysis_vars, factor_analysis_vars, 
 								  FUN=get_r_squared))
 	dimnames(r_squared_mtrx) <- list(factor_analysis_vars, quant_analysis_vars)
-	save(r_squared_mtrx, file=dss("2_new_r_squared_mtrx_%s.Rdata", A_YEAR))
+	save(r_squared_mtrx, file=rsq_file)
 	rm(r_squared_mtrx, get_r_squared)
 
 }
 
 
 # Cramer's V
-if(!file.exists(dss("2_cramers_v_%s.Rdata", A_YEAR))) {
+crv_file <- file.path(out_dir, sprintf("2_cramers_v_%d.Rdata", A_YEAR))
+if(!file.exists(crv_file)) {
 
 	cramers_v <- function(x, y) {
 		lx <- length(levels(x))
@@ -238,8 +239,8 @@ if(!file.exists(dss("2_cramers_v_%s.Rdata", A_YEAR))) {
 
 
 # Get matrix of R2 for predicting missingness
-
-if(!file.exists(dss("2_NA_r_squared_mtrx_%s.Rdata", A_YEAR))) {
+narsq_file <- file.path(out_dir, sprintf("2_NA_r_squared_mtrx_%d.Rdata", A_YEAR))
+if(!file.exists(narsq_file)) {
 
 	r <- !is.na(d)
 
@@ -254,20 +255,20 @@ if(!file.exists(dss("2_NA_r_squared_mtrx_%s.Rdata", A_YEAR))) {
 	NA_r_squared_mtrx <- outer(analysis_vars, analysis_vars, 
 							   FUN=get_NA_r_squared)
 	dimnames(NA_r_squared_mtrx) <- list(analysis_vars, analysis_vars)
-	save(NA_r_squared_mtrx, file=dss("2_NA_r_squared_mtrx_%s.Rdata", A_YEAR))
+	save(NA_r_squared_mtrx, file=narsq_file)
 	rm(NA_r_squared_mtrx, get_NA_r_squared, r)
 
 }
 
 
 # Get matrix of puc
-
-if(!file.exists(dss("2_puc_%s.Rdata", A_YEAR))) {
+puc_file <- file.path(out_dir, sprintf("2_puc_%d.Rdata", A_YEAR))
+if(!file.exists(puc_file)) {
 
 	library(mice)
 	p <- md.pairs(d)
 	puc <- p$mr/(p$mr + p$mm)
-	save(puc, file=dss("2_puc_%s.Rdata", A_YEAR))
+	save(puc, file=puc_file)
 	rm(p, puc)
 
 }

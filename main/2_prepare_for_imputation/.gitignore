@@ -1,1 +1,2 @@
 1_variable_distributions
+*.o[0-9]*
