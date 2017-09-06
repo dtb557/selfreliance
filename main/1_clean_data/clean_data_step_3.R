@@ -1,18 +1,24 @@
+library(data.table)
+library(stringr)
+library(foreign)
+
 # CLEANING TO PREPARE FOR MULTIPLE IMPUTATION OR NOT?
 
 # imputation <- FALSE
 imputation <- TRUE
 
+cargs <- commandArgs(trailingOnly = TRUE)
+cargs <- str_subset(cargs, "imputation")
+if(length(cargs) == 1) imputation <- str_detect(cargs, "TRUE")
+
 if(imputation) {
-    STEP_2_DATA = "Data/cleaned_data/cleaned_data_step_2.Rdata"
+    STEP_2_DATA = "main/1_clean_data/cleaned_data_step_2.Rdata"
 } else {
-    STEP_2_DATA = "Data/cleaned_data/cleaned_data_step_2_no_imputation.Rdata"
+    STEP_2_DATA = "main/1_clean_data/cleaned_data_step_2_no_imputation.Rdata"
 }
 
 if(!file.exists(STEP_2_DATA)) stop("Cannot perform step 3 of data cleaning without data from step 2.")
 
-library(data.table)
-library(foreign)
 
 source("functions/dss.R")
 source("functions/do_string.R")
@@ -64,7 +70,7 @@ d[marst=="Married, spouse present" & sploc==0, marst := "Married, spouse absent"
 d[marst=="Married, spouse absent" & cohabp1==FALSE & cohabp2==FALSE, marr_cohab := "Not married or cohabiting"]
 
 # Load nchild
-nchild <- data.table(read.dta("Data/ipums_data_full/cps_nchild.dta"))
+nchild <- data.table(read.dta("original_data/cps_nchild.dta"))
 setkey(nchild, year, serial, pernum)
 setkey(d, year, serial, pernum)
 d <- nchild[d]
@@ -144,7 +150,7 @@ d[relative_or_foster_child_of_head==FALSE & marr_cohab=="Not married or cohabiti
 d[ , n_subfam := length(unique(subfamid)), by=key(d)]
 
 # Load ftype
-ftype <- data.table(read.dta("Data/ipums_data_full/cps_ftype.dta"))
+ftype <- data.table(read.dta("original_data/cps_ftype.dta"))
 setkey(ftype, year, serial, pernum)
 setkey(d, year, serial, pernum)
 d <- ftype[d]
@@ -158,7 +164,7 @@ nrow(unique(d))
 # Good: 977,359 family heads and the same number of subfamilies
 
 if(imputation) {
-    save(d, file="Data/cleaned_data/cleaned_data_step_3.Rdata")
+    save(d, file="main/1_clean_data/cleaned_data_step_3.Rdata")
 } else {
-    save(d, file="Data/cleaned_data/cleaned_data_step_3_no_imputation.Rdata")
+    save(d, file="main/1_clean_data/cleaned_data_step_3_no_imputation.Rdata")
 }

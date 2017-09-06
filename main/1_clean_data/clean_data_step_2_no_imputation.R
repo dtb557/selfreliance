@@ -1,4 +1,4 @@
-STEP_1_DATA = "Data/cleaned_data/cleaned_data_step_1.Rdata"
+STEP_1_DATA = "main/1_clean_data/cleaned_data_step_1.Rdata"
 
 if(!file.exists(STEP_1_DATA)) stop("Cannot perform step 2 of data cleaning without data from step 1.")
 
@@ -63,7 +63,7 @@ change_name("qincsur2", "incsurv2")
 rm(change_name)
 
 # Load topcodes and transform into matrix with rownames as varnames and colnames as years
-topcodes <- data.table(read.csv("Data/topcode_values.csv", stringsAsFactors=FALSE))
+topcodes <- data.table(read.csv("original_data/topcode_values.csv", stringsAsFactors=FALSE))
 varnames <- topcodes$var
 topcodes[ , var := NULL]
 topcodes <- as.matrix(topcodes)
@@ -84,4 +84,4 @@ for(v in rownames(topcodes)) {
 
 rm(topcodes, tc_var)
 
-save(d, file="Data/cleaned_data/cleaned_data_step_2_no_imputation.Rdata")
+save(d, file="main/1_clean_data/cleaned_data_step_2_no_imputation.Rdata")

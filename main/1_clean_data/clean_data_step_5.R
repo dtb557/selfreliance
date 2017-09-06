@@ -1,17 +1,22 @@
+library(data.table)
+library(stringr)
+
 # CLEANING TO PREPARE FOR MULTIPLE IMPUTATION OR NOT?
 
 # imputation <- FALSE
 imputation <- TRUE
 
+cargs <- commandArgs(trailingOnly = TRUE)
+cargs <- str_subset(cargs, "imputation")
+if(length(cargs) == 1) imputation <- str_detect(cargs, "TRUE")
+
 if(imputation) {
-    STEP_4_DATA = "Data/cleaned_data/cleaned_data_step_4.Rdata"
+    STEP_4_DATA = "main/1_clean_data/cleaned_data_step_4.Rdata"
 } else {
-    STEP_4_DATA = "Data/cleaned_data/cleaned_data_step_4_no_imputation.Rdata"
+    STEP_4_DATA = "main/1_clean_data/cleaned_data_step_4_no_imputation.Rdata"
 }
 
 if(!file.exists(STEP_4_DATA)) stop("Cannot perform step 5 of data cleaning without data from step 4.")
-
-library(data.table)
 
 load(STEP_4_DATA)
 
@@ -116,8 +121,9 @@ d[ , hispan := factor(hispan_recode[as.character(hispan)])]
 rm(hispan_recode)
 
 # Add back incwelfr with allocated values to use as a predictor in the imputation
-attach("Data/ipums_data_full/cps_master.Rdata")
+attach("original_data/cps_master.Rdata")
 master <- get("d", pos=2)[ , .(incwelfr), keyby=.(year, serial, pernum)]
+detach(2)
 source("functions/fix_na_niu_values.R")
 master <- fix_na_niu_values(master)
 setnames(master, old="incwelfr", new="incwelfr_alloc")
@@ -128,8 +134,8 @@ d[ , incwelfr_alloc := 100*incwelfr_alloc/pce]
 
 
 if(imputation) {
-    save(d, file="Data/cleaned_data/cleaned_data_step_5.Rdata")
+    save(d, file="main/1_clean_data/cleaned_data_step_5.Rdata")
 } else {
-    save(d, file="Data/cleaned_data/cleaned_data_step_5_no_imputation.Rdata")
+    save(d, file="main/1_clean_data/cleaned_data_step_5_no_imputation.Rdata")
 }
 

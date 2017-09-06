@@ -1,18 +1,23 @@
+library(data.table)
+library(stringr)
+
 # CLEANING TO PREPARE FOR MULTIPLE IMPUTATION OR NOT?
 
 # imputation <- FALSE
 imputation <- TRUE
 
+cargs <- commandArgs(trailingOnly = TRUE)
+cargs <- str_subset(cargs, "imputation")
+if(length(cargs) == 1) imputation <- str_detect(cargs, "TRUE")
+
 if(imputation) {
-    STEP_3_DATA = "Data/cleaned_data/cleaned_data_step_3.Rdata"
+    STEP_3_DATA = "main/1_clean_data/cleaned_data_step_3.Rdata"
 } else {
-    STEP_3_DATA = "Data/cleaned_data/cleaned_data_step_3_no_imputation.Rdata"
+    STEP_3_DATA = "main/1_clean_data/cleaned_data_step_3_no_imputation.Rdata"
 }
 
 
 if(!file.exists(STEP_3_DATA)) stop("Cannot perform step 4 of data cleaning without data from step 3.")
-
-library(data.table)
 
 load(STEP_3_DATA)
 
@@ -113,8 +118,8 @@ d <- d[ , list(sqrt_famsize=sqrt(length(pernum))), by=key(d)][d]
 d[is.na(sex) & pnloc > 0, sex := ifelse(pn_sex=="Male", "Female", "Male")]
 
 if(imputation) {
-    save(d, file="Data/cleaned_data/cleaned_data_step_4.Rdata")
+    save(d, file="main/1_clean_data/cleaned_data_step_4.Rdata")
 } else {
-    save(d, file="Data/cleaned_data/cleaned_data_step_4_no_imputation.Rdata")
+    save(d, file="main/1_clean_data/cleaned_data_step_4_no_imputation.Rdata")
 }
 

@@ -4,7 +4,7 @@ library(foreign)
 source("functions/fix_na_niu_values.R")
 
 cat(paste0(format(Sys.time(), format="%H:%M:%S"), "    Loading data...\n"))
-load("Data/ipums_data_full/cps_master.Rdata")
+load("original_data/cps_master.Rdata")
 
 cat(paste0(format(Sys.time(), format="%H:%M:%S"), "    Fixing NA and NIU values...\n"))
 d <- fix_na_niu_values(d)
@@ -29,7 +29,7 @@ d[year >=2009 & age==80, age := "82"]
 d[ , age := as.integer(as.character(age))]
 
 # Load and attach group quarters variable
-gq <- data.table(read.dta("Data/ipums_data_full/cps_group_quarters.dta"))
+gq <- data.table(read.dta("original_data/cps_group_quarters.dta"))
 setkey(gq, year, serial, pernum)
 setkey(d, year, serial, pernum)
 d <- gq[d]
@@ -203,4 +203,4 @@ d[ , cohabp2_famunit := famunit[cohabp2], by=key(d)]
 d[famunit==cohabp2_famunit, famunit := "1st family in household or group quarters"]
 d[ , cohabp2_famunit := NULL]
 
-save(d, file="Data/cleaned_data/cleaned_data_step_1.Rdata")
+save(d, file="main/1_clean_data/cleaned_data_step_1.Rdata")
