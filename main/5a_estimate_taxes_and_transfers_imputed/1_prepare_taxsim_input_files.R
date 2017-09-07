@@ -29,7 +29,7 @@ setkey(vars_to_add, year, serial, pernum)
 for(yr in c(1970, 1980, 1990, 2000, 2010)) {
     # if(!(yr %in% c(1990, 2000))) next
     cat(paste0(yr, " "))
-    imp_file <- sprintf("main/3_multiply_impute/3_imp_%d_10_extreme_values_transposed.Rdata", yr)
+    imp_file <- sprintf("main/4_fix_pre_imputation_problems/1_imp_%d_10_fixed.Rdata", yr)
     if(!file.exists(imp_file)) next
     load(imp_file)
     for(i in 1:10) {

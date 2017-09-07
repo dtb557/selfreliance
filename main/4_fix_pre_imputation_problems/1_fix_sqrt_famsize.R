@@ -18,5 +18,5 @@ for(yr in seq(1970, 2010, by=10)) {
         mutate(sqrt_famsize=n()) %>%
         ungroup() %>%
         select(-subfamid)
-    save(imp, file=sprintf("main/4_fix_pre_imputation_problems/1_imp_%d_10_fixed.Rdata"))
+    save(imp, file=sprintf("main/4_fix_pre_imputation_problems/1_imp_%d_10_fixed.Rdata", yr))
 }
