@@ -17,7 +17,7 @@ do_string <- function(x) {
     eval(parse(text=x), envir=parent.frame())
 }
 
-source("taxsim/make_taxsim_dataset.R")
+source("functions/make_taxsim_dataset.R")
 
 # Load master dataset to fill in missing age values
 # I fixed this problem in the latest imputation
@@ -31,7 +31,7 @@ source("taxsim/make_taxsim_dataset.R")
 # age[year >=2009 & age==80, age := "82"]
 # age[ , age := as.integer(as.character(age))]
 
-load("Data/cleaned_data/cleaned_data_step_5.Rdata")
+load("main/1_clean_data/cleaned_data_step_5.Rdata")
 
 vars_to_add <- d[ , .(year, serial, pernum, momloc, poploc, sploc, nchild, relate, 
             pce)] #, schlcoll, srcearn)]
@@ -41,7 +41,7 @@ setkey(vars_to_add, year, serial, pernum)
 for(yr in c(1970, 1980, 1990, 2000, 2010)) {
     # if(!(yr %in% c(1990, 2000))) next
     cat(paste0(yr, " "))
-    imp_file <- sprintf("Data/imp_iterations/with_ppc/imp_%d_10_extreme_values_transposed.Rdata", yr)
+    imp_file <- sprintf("main/3_multiply_impute/3_imp_%d_10_extreme_values_transposed.Rdata", yr)
     if(!file.exists(imp_file)) next
     load(imp_file)
     for(i in 1:10) {
@@ -86,7 +86,7 @@ for(yr in c(1970, 1980, 1990, 2000, 2010)) {
               by=.(year, serial, pernum)]
         out <- make_taxsim_dataset(copy(dimp))
         out <- rbind(c(9, 85, 2, rep(0, 19)), as.matrix(out))
-        write.table(out, file=paste0("taxsim/taxsim_input/sr", yr, "_", i), row.names=FALSE, 
+        write.table(out, file=paste0("main/4a_estimate_taxes_and_transfers_imputed/1_taxsim_input/sr", yr, "_", i), row.names=FALSE, 
                     col.names=FALSE)
     }
     rm(list=c("dimp", paste0("dimp_", yr)))
