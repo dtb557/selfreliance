@@ -1,4 +1,4 @@
-AI <- Sys.getenv("PBS_ARRAY_INDEX")
+AI <- tail(commandArgs(), 1)
 NAI <- as.numeric(AI)
 
 options(error = quote(dump.frames("main/3_multiply_impute/1_error_dump/error_dump", TRUE)))
