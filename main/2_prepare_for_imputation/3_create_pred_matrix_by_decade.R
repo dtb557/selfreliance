@@ -31,7 +31,7 @@ do_string <- function(x) {
     eval(parse(text=x), envir=parent.frame())
 }
 
-load("Data/cleaned_data/cleaned_data_step_5.Rdata")
+load("main/1_clean_data/cleaned_data_step_5.Rdata")
 
 # Change pn_labern to zero for non-married/cohabiting people
 d[marr_cohab=="Not married or cohabiting", pn_labern := 0L]
@@ -85,11 +85,13 @@ load_into_list <- function(file, object_name) {
     return(out)
 }
 
-corr_list_list <- load_into_list("output/corr_list.Rdata", "corr_list")
-cramers_v_list <- load_into_list("output/cramers_v.Rdata", "cramers_v_mtrx")
-r_squared_list <- load_into_list("output/new_r_squared_mtrx.Rdata", "r_squared_mtrx")
-NA_r_squared_list <- load_into_list("output/NA_r_squared_mtrx.Rdata", "NA_r_squared_mtrx")
-puc_list <- load_into_list("output/puc.Rdata", "puc")
+stats_dir <- "main/2_prepare_for_imputation"
+
+corr_list_list <- load_into_list(file.path(stats_dir, "corr_list.Rdata"), "corr_list")
+cramers_v_list <- load_into_list(file.path(stats_dir, "cramers_v.Rdata"), "cramers_v_mtrx")
+r_squared_list <- load_into_list(file.path(stats_dir, "new_r_squared_mtrx.Rdata"), "r_squared_mtrx")
+NA_r_squared_list <- load_into_list(file.path(stats_dir, "NA_r_squared_mtrx.Rdata"), "NA_r_squared_mtrx")
+puc_list <- load_into_list(file.path(stats_dir, "puc.Rdata"), "puc")
 
 # Symmetrize Cramer's V matrix
 cramers_v_list <- lapply(cramers_v_list, function(x) {
@@ -400,5 +402,5 @@ for(i in 3:5) {
 # }
 
 # Save
-save(pred_matrix_list, file="output/pred_matrix_list.Rdata")
+save(pred_matrix_list, file="main/2_prepare_for_imputation/3_pred_matrix_list.Rdata")
 # save(reg_report_list, file="output/reg_report_list.Rdata")
