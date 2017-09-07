@@ -21,7 +21,7 @@ qois <- c("Obs Mean", "Obs SD", "Obs Max", "Topcode", "n Missing", "n Topcoded",
                                   #"Mean + 4 SD", "n > Mean + 4 SD", "Mean + 5 SD", 
                                   #"n > Mean + 5 SD")
 
-topcodes <- data.table(read.csv("Data/topcode_values.csv", stringsAsFactors=FALSE))
+topcodes <- data.table(read.csv("original_data/topcode_values.csv", stringsAsFactors=FALSE))
 varnames <- topcodes$var
 topcodes[ , var := NULL]
 topcodes <- as.matrix(topcodes)
@@ -42,7 +42,7 @@ topcodes <- round(topcodes)
 
 for(yr in yrs) {
     yr_label <- if(yr==2011) 2010 else yr
-    imp_file <- sprintf("Data/imp_iterations/with_ppc/imp_%d_10.Rdata", yr_label)
+    imp_file <- sprintf("main/3_multiply_impute/1_imp_iterations/imp_%d_10.Rdata", yr_label)
     load(imp_file)
     out <- matrix(0.0, nrow=length(income_vars), ncol=length(qois), 
                   dimnames=list(income_vars, qois))
@@ -111,6 +111,6 @@ for(yr in yrs) {
         out[v, "4 x Max"] <- round(max4)
         out[v, "% > 4 x Max"] <- 100*mean(apply(imp$imp[[v]] > max4, 2, sum))/nmis
     }
-    write.csv(out, file=sprintf("output/extreme_values_%d.csv", yr))
+    write.csv(out, file=sprintf("main/3_multiply_impute/2_extreme_values_%d.csv", yr))
     
 }
