@@ -19,18 +19,6 @@ do_string <- function(x) {
 
 source("functions/make_taxsim_dataset.R")
 
-# Load master dataset to fill in missing age values
-# I fixed this problem in the latest imputation
-# load("Data/ipums_data_full/cps_master.Rdata")
-# age <- d[ , .(year, serial, pernum, age)]
-# setkey(age, year, serial, pernum)
-# 
-# age[age=="Under 1 year", age := "0"]
-# age[age=="99+", age := "99"]
-# age[age=="90 (90+, 1988-2002)", age := "90"]
-# age[year >=2009 & age==80, age := "82"]
-# age[ , age := as.integer(as.character(age))]
-
 load("main/1_clean_data/cleaned_data_step_5.Rdata")
 
 vars_to_add <- d[ , .(year, serial, pernum, momloc, poploc, sploc, nchild, relate, 
