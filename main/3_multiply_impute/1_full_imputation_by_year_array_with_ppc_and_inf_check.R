@@ -141,7 +141,7 @@ if(A_YEAR >= 1990) {
 
 
 # Load predictor matrix
-load("output/pred_matrix_list.Rdata")
+load("main/2_prepare_for_imputation/3_pred_matrix_list.Rdata")
 
 # Zero out the age_group rows
 pred_matrix_list <- lapply(pred_matrix_list, function(x) {
@@ -201,7 +201,7 @@ pred_matrix_list <- lapply(pred_matrix_list, function(x) {
 
 
 # Load transformations matrix
-tform <- as.matrix(read.csv("output/variable_distributions/variable_transformations.csv", row.names=1))
+tform <- as.matrix(read.csv("main/2_prepare_for_imputation/1_variable_distributions/variable_transformations.csv", row.names=1))
 tform <- tform[ , NAI]
 
 # Create adjustments matrix to keep track of added constants
@@ -446,7 +446,7 @@ mice.impute.rev_polyreg <- function (y, ry, x, nnet.maxit = 100, nnet.trace = FA
 environment(mice.impute.rev_polyreg) <- environment(mice.impute.polyreg)
 
 # Load topcodes and transform into matrix with rownames as varnames and colnames as years
-topcodes <- data.table(read.csv("Data/topcode_values.csv", stringsAsFactors=FALSE))
+topcodes <- data.table(read.csv("original_data/topcode_values.csv", stringsAsFactors=FALSE))
 varnames <- topcodes$var
 topcodes[ , var := NULL]
 topcodes <- as.matrix(topcodes)
@@ -539,7 +539,7 @@ imp_formulas <- apply(pred_matrix_list[[NAI]], 1, function(x) {
 #################################################################################
 #################################################################################
 
-ITER_DIR = "Data/imp_iterations/with_ppc/"
+ITER_DIR = "main/3_multiply_impute/1_imp_iterations/"
 
 saved_iterations <- list.files(path=ITER_DIR, pattern=dss("imp_%s_\\d\\.Rdata", c(A_YEAR)))
 if(length(saved_iterations)==0) {
