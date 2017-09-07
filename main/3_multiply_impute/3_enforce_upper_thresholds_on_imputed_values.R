@@ -36,7 +36,7 @@ for(yr in names(pce)) {
 topcodes <- round(topcodes)
 
 extreme_values <- lapply(c(yrs, 2011), function(x) {
-    as.matrix(read.csv(sprintf("output/extreme_values_%d.csv", x), 
+    as.matrix(read.csv(sprintf("main/3_multiply_impute/2_extreme_values_%d.csv", x), 
                     row.names=1, check.names=FALSE))
 })
 
@@ -71,7 +71,7 @@ transpose <- function(x, bottom, old_top, new_top) {
 
 for(yr in yrs) {
     cat(yr, "\n")
-    imp_file <- sprintf("Data/imp_iterations/with_ppc/imp_%d_10.Rdata", yr)
+    imp_file <- sprintf("main/3_multiply_impute/1_imp_iterations/imp_%d_10.Rdata", yr)
     load(imp_file)
     imp$transposed <- sapply(income_vars, function(x) NULL)
     imp$thresholds <- sapply(income_vars, function(x) NULL)
@@ -109,6 +109,6 @@ for(yr in yrs) {
             report[v, "Upper Threshold"] <- thresholds[v]
         }
     }
-    write.csv(report, file=sprintf("output/extreme_values_transposition_report_%d.csv", yr))
-    save(imp, file=sprintf("Data/imp_iterations/with_ppc/imp_%d_10_extreme_values_transposed.Rdata", yr))
+    write.csv(report, file=sprintf("main/3_multiply_impute/3_extreme_values_transposition_report_%d.csv", yr))
+    save(imp, file=sprintf("main/3_multiply_impute/3_imp_%d_10_extreme_values_transposed.Rdata", yr))
 }
