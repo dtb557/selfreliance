@@ -110,9 +110,10 @@ d[!is.na(age), age_group := factor(sapply(age, function(x)
 # Create age_group by sex interaction
 d[ , age_group_by_sex := sex:age_group]
 
-# Create sqrt_famsize
+# Create sqrt_hh_size and sqrt_famsize
 setkey(d, year, serial)
-d <- d[ , list(sqrt_famsize=sqrt(length(pernum))), by=key(d)][d]
+d[ , sqrt_hh_size := sqrt(.N), by=.(year, serial)]
+d[ , sqrt_famsize := sqrt(.N), by=.(year, serial, subfamid)]
 
 # If sex is missing (because of qsex) and pnloc > 0, make sex equal the opposite of pn_sex
 d[is.na(sex) & pnloc > 0, sex := ifelse(pn_sex=="Male", "Female", "Male")]
