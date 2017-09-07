@@ -16,7 +16,7 @@ income_vars <- c("eitcred", "fedtax", "adjginc", "taxinc",
                  "oincbus", "oincfarm", "inclongj")
 
 
-topcodes <- data.table(read.csv("Data/topcode_values.csv", stringsAsFactors=FALSE))
+topcodes <- data.table(read.csv("original_data/topcode_values.csv", stringsAsFactors=FALSE))
 varnames <- topcodes$var
 topcodes[ , var := NULL]
 topcodes <- as.matrix(topcodes)
