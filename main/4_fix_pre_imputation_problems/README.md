@@ -1,0 +1,5 @@
+This directory is for fixes that should have been incorporated into the pre-imputation data cleaning process, but which were discovered after the latest imputation run.
+
+These changes should have all been incorporated into the pre-imputation data cleaning code, but the data have not been re-imputed since those fixes were made. Whenever we re-run the imputation, we should first check this directory and make sure the fixes here have been properly incorporated. If they have, these scripts can be removed when we re-impute the data.
+
+For example, I had previously computed "sqrt_famsize" as the square root of the number of people in the *household* rather than the family. I have now fixed this is in data cleaning script #4, but the data used for the latest imputation were not cleaned with the updated version of script #4.
