@@ -18,7 +18,7 @@ do_string <- function(x) {
 
 source("functions/make_taxsim_dataset.R")
 
-load("main/1_clean_data/cleaned_data_step_5.Rdata")
+load("main/1_clean_data/cleaned_data_step_5_no_imputation.Rdata")
 
 d[year >= 1989, incwage := oincwage + inclongj*(srcearn=="Wage and salary")]
 d[year >= 1989, incbus := oincbus + inclongj*(srcearn=="Self employment")]
