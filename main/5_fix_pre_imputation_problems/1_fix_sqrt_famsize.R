@@ -12,7 +12,8 @@ fixed_sqrt_famsize <- d %>%
 rm(d)
 
 for(yr in seq(1970, 2010, by=10)) {
-    load(sprintf("main/3_multiply_impute/3_imp_%d_10_extreme_values_transposed.Rdata", yr))
+    load(file.path("main/4a_estimate_taxes_and_transfers_imputed", 
+                   sprintf("6_imp_post_tax_%d.Rdata", yr)))
     imp$data <- imp$data %>%
         rename(sqrt_hh_size = sqrt_famsize) %>%
         left_join(fixed_sqrt_famsize, by=c("year", "serial", "pernum"))

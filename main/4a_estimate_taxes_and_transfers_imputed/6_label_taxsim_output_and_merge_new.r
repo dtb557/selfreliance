@@ -17,9 +17,11 @@ create_empty_imp_set <- function() {
     )
 }
 
+taxsim_output_dir <- "main/4a_estimate_taxes_and_transfers_imputed/4_taxsim_output"
+
 for(yr in seq(1970, 2010, 10)) {
     # if(yr %in% c(1970, 1980, 2010)) next
-    imp_file <- paste0("Data/imp_iterations/with_ppc/imp_", yr, "_10_extreme_values_transposed.Rdata")
+    imp_file <- sprintf("main/3_multiply_impute/3_imp_%d_10_extreme_values_transposed.Rdata", yr)
     if(!file.exists(imp_file)) next
     cat(yr, "")
     load(imp_file)
@@ -33,7 +35,7 @@ for(yr in seq(1970, 2010, 10)) {
     imp$imp$fica_not_inflation_adj <- create_empty_imp_set()
     for(i in 1:10) {
         cat(i, "")
-        t <- data.table(read.table(paste0("taxsim/taxsim_input/sr", yr, "_", i, ".taxsim")))
+        t <- fread(file.path(taxsim_output_dir, sprintf("sr%d_%d.taxsim", yr, i)))
         t <- t[ , paste0("V", 1:29), with=FALSE]
         setnames(t, names(t), c("id", "tax_year", "state", "fed_inc_tax_liability", 
                      "state_inc_tax_liability", "fica", "fed_rate", "state_rate", 
@@ -43,7 +45,7 @@ for(yr in seq(1970, 2010, 10)) {
                      "tax_on_inc", "exemp_surtax", "gen_tax_cred", "child_tax_cred", 
                      "addl_child_tax_cred", "child_care_cred", "eitc", "inc_for_amt", 
                      "amt_liability_after_cred", "fed_inc_tax_before_cred", "fica_alt"))
-        save(t, file=paste0("taxsim/taxsim_input/taxsim_", yr, "_", i, ".Rdata"))
+        # save(t, file=file.path(taxsim_output_dir, sprintf("taxsim_%d_%d.Rdata", yr, i)))
         t[ , year := tax_year + 1]
         t <- t[ , .(year, id, fed_inc_tax_liability, fica)]
         setkey(t, year, id)
@@ -57,7 +59,8 @@ for(yr in seq(1970, 2010, 10)) {
     imp$data[ , fed_inc_tax_not_inflation_adj := NA_real_]
     imp$data[ , fica_not_inflation_adj := NA_real_]
     imp$data[ , c("id", "orig_order") := NULL, with=FALSE]
-    save(imp, file=paste0("Data/imputed_datasets_post_tax/imp_", yr, ".Rdata"))
+    save(imp, file=file.path("main/4a_estimate_taxes_and_transfers_imputed", 
+                            sprintf("6_imp_post_tax_%d.Rdata", yr)))
     cat("\n")
 }
 
