@@ -18,5 +18,5 @@ for(yr in seq(1970, 2010, by=10)) {
         rename(sqrt_hh_size = sqrt_famsize) %>%
         left_join(fixed_sqrt_famsize, by=c("year", "serial", "pernum"))
     names(imp$imp)[names(imp$imp) == "sqrt_famsize"] <- "sqrt_hh_size"
-    save(imp, file=sprintf("main/4_fix_pre_imputation_problems/1_imp_%d_10_fixed.Rdata", yr))
+    save(imp, file=sprintf("main/5_fix_pre_imputation_problems/1_imp_%d_post_tax_fixed.Rdata", yr))
 }
