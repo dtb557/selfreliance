@@ -36,6 +36,6 @@ for(yr in seq(1970, 2010, 10)) {
         make_analysis_dataset(tmp, imputed=TRUE, data_to_merge=d)
     })
     save(imps, file=file.path("main/6a_make_analysis_dataset_imputed", 
-                              sprintf("1_imps_%d_analysis_vars.Rdata")))
+                              sprintf("1_imps_%d_analysis_vars.Rdata", yr)))
     rm(imp, imps)
 }
