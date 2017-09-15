@@ -53,7 +53,14 @@ save_imp_decomp_component_tables <- function(
             for(i in 1:10) {
                 cat(i, "")
                 
-                tbl <- make_decomp_component_table(imps[[i]])
+                tbl <- make_decomp_component_table(
+                    imps[[i]], 
+                    fam_adj = fam_adj, 
+                    exclude_alloc = exclude_alloc, 
+                    exclude_top_2_pct = exclude_top_2_pct, 
+                    exclude_top_decile_female_earners = exclude_top_decile_female_earners, 
+                    exclude_top_decile_male_earners = exclude_top_decile_male_earners
+                )
                 
                 out[[i]] <- rbindlist(list(out[[i]], tbl))
             }
