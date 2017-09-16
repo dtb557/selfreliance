@@ -27,6 +27,7 @@ source("functions/build_filename_suffix.R")
 
 out <- vector(mode="list", length=10)
 
+IN_DIR <- "main/6a_make_analysis_dataset_imputed"
 OUT_DIR <- "main/8a_perform_decomposition_imputed/1_decomp_component_tables"
 
 save_imp_decomp_component_tables <- function(
@@ -49,17 +50,17 @@ save_imp_decomp_component_tables <- function(
         for(yr in seq(1970, 2010, 10)) {
             cat(yr, "")
             imp_file <- sprintf("1_imps_%d_analysis_vars.Rdata", yr)
-            load(imp_file)
+            load(file.path(IN_DIR, imp_file))
             for(i in 1:10) {
                 cat(i, "")
                 
                 tbl <- make_decomp_component_table(
                     imps[[i]], 
-                    fam_adj = fam_adj, 
-                    exclude_alloc = exclude_alloc, 
-                    exclude_top_2_pct = exclude_top_2_pct, 
-                    exclude_top_decile_female_earners = exclude_top_decile_female_earners, 
-                    exclude_top_decile_male_earners = exclude_top_decile_male_earners
+                    fam_adj, 
+                    exclude_alloc, 
+                    exclude_top_2_pct, 
+                    exclude_top_decile_female_earners, 
+                    exclude_top_decile_male_earners
                 )
                 
                 out[[i]] <- rbindlist(list(out[[i]], tbl))
@@ -96,5 +97,5 @@ save_imp_decomp_component_tables <- function(
 }
 
 save_imp_decomp_component_tables() # defaults to fam_adj and exclude_top_2_pct
-save_imp_decomp_component_tables(fam_adj = FALSE)
+save_imp_decomp_component_tables(exclude_top_2_pct = FALSE)
 

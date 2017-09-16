@@ -1,5 +1,7 @@
 make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
     
+    require(data.table)
+    
     if(!is.null(data_to_merge)) {
         setkey(data, year, serial, pernum)
         setkey(data_to_merge, year, serial, pernum)
@@ -70,6 +72,8 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
                                            inceduc, incdisab, incsurv)), 
          by=.(year, serial, pernum)]
     
+    if("posern" %in% names(data)) data[ , posern := NULL]
+    
     data[ , posern := labern > 0]
     
     data[ , inctot := as.integer(.sum(incwage, incbus, incfarm, incss, incwelfr, incgov, 
@@ -113,8 +117,6 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
     neg_fam_inc <- nrow(data[ , .(fam_inc=fam_inc[1]), by=.(year, serial, subfamid)][fam_inc < 0,])
     cat("Removing", neg_fam_inc, "families with negative income.\n")
     data <- data[fam_inc >= 0, ]
-    
-    data[ , sqrt_famsize := sqrt(.N), by=.(year, serial)]
     
     data[ , n_children_under_18 := sum((momloc > 0 | poploc > 0) & age < 18), 
          by=.(year, serial, subfamid)]

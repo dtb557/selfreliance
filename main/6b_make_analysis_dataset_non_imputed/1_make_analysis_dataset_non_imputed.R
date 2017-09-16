@@ -18,7 +18,7 @@ do_string <- function(x) {
     eval(parse(text=x), envir=parent.frame())
 }
 
-load("main/4b_estimate_taxes_and_transfers_imputed/6_non_imp_data_post_tax.Rdata")
+load("main/4b_estimate_taxes_and_transfers_non_imputed/6_non_imp_data_post_tax.Rdata")
 
 for(n in "filestat") {
     do_string(dss("d[ , %s := NULL]", n))

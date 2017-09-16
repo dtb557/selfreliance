@@ -1,5 +1,7 @@
 # Make flag to exclude cases with allocated own or partner earnings
 
+library(data.table)
+
 load("main/1_clean_data/cleaned_data_step_5.Rdata")
 d[ , labern_alloc := is.na(incwage) | is.na(incbus) | is.na(incfarm)]
 pn_labern_alloc <- d[ , .(pn_labern_alloc=labern_alloc),

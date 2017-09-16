@@ -27,7 +27,7 @@ source("functions/build_filename_suffix.R")
 
 out <- vector(mode="list", length=10)
 
-OUT_DIR <- "main/8b_perform_decomposition_imputed/1_decomp_component_tables"
+OUT_DIR <- "main/8b_perform_decomposition_non_imputed/1_decomp_component_tables"
 
 
 
@@ -51,10 +51,10 @@ save_non_imp_decomp_component_tables <- function(
         tbl <- make_decomp_component_table(
             d, 
             fam_adj = fam_adj, 
-            exclude_alloc = exclude_alloc, 
-            exclude_top_2_pct = exclude_top_2_pct, 
-            exclude_top_decile_female_earners = exclude_top_decile_female_earners, 
-            exclude_top_decile_male_earners = exclude_top_decile_male_earners
+            exclude_alloc, 
+            exclude_top_2_pct, 
+            exclude_top_decile_female_earners, 
+            exclude_top_decile_male_earners
         )
         
         outfile <- 
@@ -67,6 +67,6 @@ save_non_imp_decomp_component_tables <- function(
         
 }
 
-save_imp_decomp_component_tables() # defaults to fam_adj and exclude_top_2_pct
-save_imp_decomp_component_tables(fam_adj = FALSE)
+save_non_imp_decomp_component_tables() # defaults to fam_adj and exclude_top_2_pct
+save_non_imp_decomp_component_tables(fam_adj = FALSE)
 

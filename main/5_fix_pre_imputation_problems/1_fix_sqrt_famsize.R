@@ -6,7 +6,7 @@ load("main/1_clean_data/cleaned_data_step_5.Rdata")
 fixed_sqrt_famsize <- d %>%
     select(-sqrt_famsize) %>%
     group_by(year, serial, subfamid) %>%
-    mutate(sqrt_famsize = n()) %>%
+    mutate(sqrt_famsize = sqrt(n())) %>%
     ungroup() %>%
     select(year, serial, pernum, sqrt_famsize)
 rm(d)

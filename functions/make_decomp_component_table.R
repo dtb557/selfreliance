@@ -20,7 +20,7 @@ make_decomp_component_table <- function(data, fam_adj = TRUE, exclude_alloc = FA
         data <- exclude_alloc(data)
     }
     
-    if(exclude_top_2) {
+    if(exclude_top_2_pct) {
         source("functions/exclude_top_2_pct.R")
         data <- exclude_top_2_pct(data, flag_version = "non-imputed")
     }
@@ -41,13 +41,13 @@ make_decomp_component_table <- function(data, fam_adj = TRUE, exclude_alloc = FA
     
     # First, create population-level (sex and year specific) variables
     setkey(data, sex, decade)
-    data[ , sigma_x := sqrt(wtd.var(labern, wtsupp)), by=key(d)]
-    data[ , sigma_y := sqrt(wtd.var(fam_inc, wtsupp)), by=key(d)]
-    data[ , mu_x := wtd.mean(labern, wtsupp), by=key(d)]
-    data[ , mu_y := wtd.mean(fam_inc, wtsupp), by=key(d)]
-    data[ , mu_other := wtd.mean(other_inc, wtsupp), by=key(d)]
-    data[ , mu_pn := wtd.mean(pn_labern, wtsupp), by=key(d)]
-    data[ , total_pop := sum(wtsupp), by=key(d)]
+    data[ , sigma_x := sqrt(wtd.var(labern, wtsupp)), by=key(data)]
+    data[ , sigma_y := sqrt(wtd.var(fam_inc, wtsupp)), by=key(data)]
+    data[ , mu_x := wtd.mean(labern, wtsupp), by=key(data)]
+    data[ , mu_y := wtd.mean(fam_inc, wtsupp), by=key(data)]
+    data[ , mu_other := wtd.mean(other_inc, wtsupp), by=key(data)]
+    data[ , mu_pn := wtd.mean(pn_labern, wtsupp), by=key(data)]
+    data[ , total_pop := sum(wtsupp), by=key(data)]
     
     # Now consolidate all into group level (sex, year, and fam-structure specific) variables
     data[ , fam_structure := marr_cohab:num_earners]
@@ -76,9 +76,7 @@ make_decomp_component_table <- function(data, fam_adj = TRUE, exclude_alloc = FA
         cor_xg_partnerg = wtd.cors(labern, pn_labern, wtsupp)[1],
         cor_xg_otherg = wtd.cors(labern, other_inc, wtsupp)[1]
         
-    ), by=key(d)]
-    
-    rm(d)
+    ), by=key(data)]
     
     qoi[ , cov_xg_partnerg := cor_xg_partnerg*sigma_gx*sigma_gpartner]
     qoi[ , cov_xg_otherg := cor_xg_otherg*sigma_gx*sigma_gother]

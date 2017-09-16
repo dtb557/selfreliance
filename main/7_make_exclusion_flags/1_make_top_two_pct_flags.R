@@ -19,7 +19,9 @@ make_flags_for_top_2_pct <- function(data) {
 
 top_2_flag_non_imp <- make_flags_for_top_2_pct(d)
 
-save(top_2_flag_non_imp, file="main/7_make_top_two_pct_flags/1_top_2_pct_flag_non_imp.Rdata")
+save(top_2_flag_non_imp, file="main/7_make_exclusion_flags/1_top_2_pct_flag_non_imp.Rdata")
+
+rm(d)
 
 # Make imputed top two percent flag
 top_2_flag_imps <- lapply(seq(1970, 2010, 10), 
@@ -27,14 +29,15 @@ top_2_flag_imps <- lapply(seq(1970, 2010, 10),
         load(file.path("main/6a_make_analysis_dataset_imputed", 
                        sprintf("1_imps_%d_analysis_vars.Rdata", yr)))
         fam_inc_dts <- lapply(imps, function(imp) {
-            imp[ , .(fam_inc), keyby=.(year, serial, pernum)]
+            imp[ , .(fam_inc, wtsupp), keyby=.(year, serial, pernum)]
         })
         fam_inc_long <- rbindlist(fam_inc_dts)
-        fam_inc_avg <- fam_inc_long[ , .(fam_inc=mean(fam_inc)), by=.(year, serial, pernum)]
+        fam_inc_avg <- fam_inc_long[ , .(fam_inc=mean(fam_inc), wtsupp=wtsupp[1]), 
+                                     by=.(year, serial, pernum)]
         make_flags_for_top_2_pct(fam_inc_avg)
     }
 )
 
 top_2_flag_imp <- rbindlist(top_2_flag_imps)
     
-save(top_2_flag_imp, file="main/7_make_top_two_pct_flags/1_top_2_pct_flag_imp.Rdata")
+save(top_2_flag_imp, file="main/7_make_exclusion_flags/1_top_2_pct_flag_imp.Rdata")

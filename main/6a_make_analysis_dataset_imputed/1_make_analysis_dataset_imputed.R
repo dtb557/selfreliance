@@ -2,6 +2,7 @@
 # Create analysis variables and save datasets with only necessary variables #
 #############################################################################
 library(data.table)
+library(mice)
 
 source("functions/make_analysis_dataset.R")
 
@@ -31,7 +32,7 @@ for(yr in seq(1970, 2010, 10)) {
         #     do_string(dss("imp[ , %s := NULL]", n))
         # }
         
-        tmp <- complete(imp, i)
+        tmp <- data.table(complete(imp, i))
         
         make_analysis_dataset(tmp, imputed=TRUE, data_to_merge=d)
     })
