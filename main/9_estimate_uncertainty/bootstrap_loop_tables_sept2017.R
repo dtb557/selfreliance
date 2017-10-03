@@ -8,12 +8,40 @@
 #        uncertainty around key point estimates
 # September 2017
 
+###
+# R packages
+###
+
+library(data.table)
+
+
+###
+# Directories and files
+###
+
+DATA_DIR <- "main/6a_make_analysis_dataset_imputed"
+DATA_FILE_PATTERN <- "1_imps_%d_analysis_vars.Rdata" # "%d" is placeholder for year
+OUT_DIR <- "main/9_estimate_uncertainty"
+INTERMEDIATE_OUT_FILE <- "all_bootstrap_decomp_tables.Rdata"
+OUT_FILE <- "tabs_list.RData"
+
+
+###
+# Parameters
+###
+
+NBOOT <- 1000 # set number of bootstrap samples
 
 
 ### 
 # Functions
 # (run outside the bootstrap loop)
 ### 
+
+
+## Derek's function to create decomp components
+source("functions/make_decomp_component_table.R")
+
 
 ## Functions to calculate numbers that go into tables
 #
@@ -908,75 +936,118 @@ fun.tabs.list <- function(out.decomp.1,out.decomp.2,out.decomp.3,out.decomp.4,ou
 ###
 
 
+## Create list of decomp components
+# Data is saved by decade, but we will combine results across
+# decades by imputation index (1-10) and bootstrap index (1-NBOOT)
+# to yield NBOOT sets of decomp components
+
+decomp_component_list <- vector(mode = "list", length = 10)
+
+for(i in 1:10) {
+    decomp_component_list[[i]] <- vector(mode = "list", length = NBOOT)
+}
+
+for(yr in c(1970, 1980, 1990, 2000, 2010)) {
+    data_file <- sprintf(DATA_FILE_PATTERN, yr)
+    load( # loads list of imputed data.frames named "imps"
+        file.path(
+            DATA_DIR, 
+            data_file
+        )
+    ) 
+    
+    for(imp_i in 1:10) {
+        
+        for(sample_i in 1:NBOOT) {
+            bsamp <- sample(
+                1:nrow(imps[[imp_i]]), 
+                nrow(imps[[imp_i]]), 
+                replace = TRUE
+            )
+            tbl <- make_decomp_component_table(
+                imps[[imp_i]][bsamp, ], 
+                fam_adj = TRUE, 
+                exclude_alloc = FALSE, 
+                exclude_top_2_pct = FALSE, 
+                exclude_top_decile_female_earners = FALSE, 
+                exclude_top_decile_male_earners = FALSE
+            )
+            decomp_component_list[[imp_i]][[sample_i]] <- 
+                # Row-bind results across decades by imputation index (imp_i)
+                # and bootstrap index (sample_i)
+                rbindlist(
+                    list(
+                        decomp_component_list[[imp_i]][[sample_i]],
+                        tbl
+                    )
+                )
+        }
+        
+    }
+    
+}
+
+# Save decomp_component_list in case we need it and don't want to regenerate it
+save(
+    decomp_component_list,
+    file = file.path(
+        OUT_DIR, 
+        INTERMEDIATE_OUT_FILE
+    )
+)
+
 ## Initiate lists of tables 
-## and run loop to populate thelist
+## and run loop to populate the list
 #
 # (initiate list of tables)
-tabs.list <- NULL
-#
-# (set nboot = number of bootstrap samples)
-nboot <- 1000
+tabs.list <- vector(mode = "list", length = NBOOT)
 #
 # (run loop)
-for(in in 1:nboot) {
+for(i in 1:NBOOT) {
 	## Data 
-    # (read in spreadsheets for tables) 
+    # (tables are in "decomp_component_list" created above) 
     # 
-    # (versions from 10 imputations)
-    # (NOTE THAT I AM ASSUMING THAT THE FORMAT OF THE NAMES WILL BE 
-    #  "New decomposition components new imputation fam adj `y'_`i'", 
-    #   where `y' is the imputation number and `i' is the bootstrap number)
-    dat.decomp.imp.1 <- read.csv(paste("New decomposition components new imputation fam adj 1_",i,".csv",sep=""),header=T)
-    dat.decomp.imp.2 <- read.csv(paste("New decomposition components new imputation fam adj 2_",i,".csv",sep=""),header=T)
-    dat.decomp.imp.3 <- read.csv(paste("New decomposition components new imputation fam adj 3_",i,".csv",sep=""),header=T)
-    dat.decomp.imp.4 <- read.csv(paste("New decomposition components new imputation fam adj 4_",i,".csv",sep=""),header=T)
-    dat.decomp.imp.5 <- read.csv(paste("New decomposition components new imputation fam adj 5_",i,".csv",sep=""),header=T)
-    dat.decomp.imp.6 <- read.csv(paste("New decomposition components new imputation fam adj 6_",i,".csv",sep=""),header=T)
-    dat.decomp.imp.7 <- read.csv(paste("New decomposition components new imputation fam adj 7_",i,".csv",sep=""),header=T)
-    dat.decomp.imp.8 <- read.csv(paste("New decomposition components new imputation fam adj 8_",i,".csv",sep=""),header=T)
-    dat.decomp.imp.9 <- read.csv(paste("New decomposition components new imputation fam adj 9_",i,".csv",sep=""),header=T)
-    dat.decomp.imp.10 <- read.csv(paste("New decomposition components new imputation fam adj 10_",i,".csv",sep=""),header=T) 
-    # 
-    # (prep the data using function that replaces some NAs ith zeros and separates men/women)
-    dat.decomp1 <- fun.data.prep(dat.decomp.imp.1)
-    dat.decomp2 <- fun.data.prep(dat.decomp.imp.2)
-    dat.decomp3 <- fun.data.prep(dat.decomp.imp.3)
-    dat.decomp4 <- fun.data.prep(dat.decomp.imp.4)
-    dat.decomp5 <- fun.data.prep(dat.decomp.imp.5)
-    dat.decomp6 <- fun.data.prep(dat.decomp.imp.6)
-    dat.decomp7 <- fun.data.prep(dat.decomp.imp.7)
-    dat.decomp8 <- fun.data.prep(dat.decomp.imp.8)
-    dat.decomp9 <- fun.data.prep(dat.decomp.imp.9)
-    dat.decomp10 <- fun.data.prep(dat.decomp.imp.10)
-    #           
+    
+    dat.decomp.imp.list <- lapply(
+        decomp_component_list,
+        function(x) {
+            x[[i]]
+        }
+    )
+    
+    # (prep the data using function that replaces some NAs with zeros and separates men/women)
+    dat.decomp.list <- lapply(
+        dat.decomp.imp.list, 
+        fun.data.prep
+    )
+
     # (further prep the data by applying function that 
     #  decomposes change in self-relience to get decomposition output for each imputation)
-    out.decomp1 <- fun.sr.decomp.5piece.apply(dat.decomp1)
-    out.decomp2 <- fun.sr.decomp.5piece.apply(dat.decomp2)
-    out.decomp3 <- fun.sr.decomp.5piece.apply(dat.decomp3)
-    out.decomp4 <- fun.sr.decomp.5piece.apply(dat.decomp4)
-    out.decomp5 <- fun.sr.decomp.5piece.apply(dat.decomp5)
-    out.decomp6 <- fun.sr.decomp.5piece.apply(dat.decomp6)
-    out.decomp7 <- fun.sr.decomp.5piece.apply(dat.decomp7)
-    out.decomp8 <- fun.sr.decomp.5piece.apply(dat.decomp8)
-    out.decomp9 <- fun.sr.decomp.5piece.apply(dat.decomp9)
-    out.decomp10 <- fun.sr.decomp.5piece.apply(dat.decomp10) 
-	# 
+    out.decomp.list <- lapply(
+        dat.decomp.list, 
+        fun.sr.decomp.5piece.apply
+    )
+
+    
 	## Tables
 	#
 	# (apply function to get all the tables for a given bootstrap sample)
-	tabs.boot <- fun.tabs.list(out.decomp1,out.decomp2,out.decomp3,out.decomp4,out.decomp5,
-                               out.decomp6,out.decomp7,out.decomp8,out.decomp9,out.decomp10,
-                               dat.decomp1,dat.decomp2,dat.decomp3,dat.decomp4,dat.decomp5,
-                               dat.decomp6,dat.decomp7,dat.decomp8,dat.decomp9,dat.decomp10)
-    #
-	# (append all tables to list of tables from all boostrap samples)
-	tabs.list <- append(tabs.list,tabs.boot)
-	}
+    tabs.boot <- do.call(
+        fun.tabs.list, 
+        c(
+            out.decomp.list, 
+            dat.decomp.list
+        )
+    )
+
+	# (append all tables to list of tables from all bootstrap samples)
+	tabs.list[[i]] <- tabs.boot
+	
+}
 
          
 ## Save list of tables
-save(tabs.list,file="tabs_list.RData")
+save(tabs.list,file=OUT_FILE)
 
 
 
