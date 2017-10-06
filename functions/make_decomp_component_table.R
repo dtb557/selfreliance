@@ -2,6 +2,8 @@ make_decomp_component_table <- function(data, fam_adj = TRUE, exclude_alloc = FA
              exclude_top_2_pct = TRUE, exclude_top_decile_female_earners = FALSE, 
              exclude_top_decile_male_earners = FALSE) {
     
+    require(Hmisc)
+    require(weights)
     source("functions/fixed_wtd.rank.R")
     
     out <- list()

@@ -585,7 +585,7 @@ fun.tab04 <- function(dat.decomp) {
                                   "Single, Earning","Single, Not earning")
              colnames(tab04) <- c("W Share 1970","W Share 2010","W Association 1970","W Association 2010","W Std. Assoc. 1970","W Std. Assoc. 2010",
                                   "M Share 1970","M Share 2010","M Association 1970","M Association 2010","M Std. Assoc. 1970","M Std. Assoc. 2010") 
-             return(tab04)                                          
+             return(as.matrix(tab04))                                          
              } 
 #
 # Function to create table 5 from each imputed data set
@@ -935,66 +935,78 @@ fun.tabs.list <- function(out.decomp.1,out.decomp.2,out.decomp.3,out.decomp.4,ou
 # (requires looping over bootstrap samples)
 ###
 
-
-## Create list of decomp components
-# Data is saved by decade, but we will combine results across
-# decades by imputation index (1-10) and bootstrap index (1-NBOOT)
-# to yield NBOOT sets of decomp components
-
-decomp_component_list <- vector(mode = "list", length = 10)
-
-for(i in 1:10) {
-    decomp_component_list[[i]] <- vector(mode = "list", length = NBOOT)
-}
-
-for(yr in c(1970, 1980, 1990, 2000, 2010)) {
-    data_file <- sprintf(DATA_FILE_PATTERN, yr)
-    load( # loads list of imputed data.frames named "imps"
-        file.path(
-            DATA_DIR, 
-            data_file
-        )
-    ) 
+## Load list of decomp components if it already exists
+decomp_component_file <- file.path(OUT_DIR, INTERMEDIATE_OUT_FILE)
+if (file.exists(decomp_component_file)) {
+    load(decomp_component_file)
+} else {
+    ## Create list of decomp components
+    # Data is saved by decade, but we will combine results across
+    # decades by imputation index (1-10) and bootstrap index (1-NBOOT)
+    # to yield NBOOT sets of decomp components
     
-    for(imp_i in 1:10) {
+    decomp_component_list <- vector(mode = "list", length = 10)
+    
+    for(i in 1:10) {
+        decomp_component_list[[i]] <- vector(mode = "list", length = NBOOT)
+    }
+    
+    for(yr in c(1970, 1980, 1990, 2000, 2010)) {
+        data_file <- sprintf(DATA_FILE_PATTERN, yr)
+        load( # loads list of imputed data.frames named "imps"
+            file.path(
+                DATA_DIR, 
+                data_file
+            )
+        )
         
-        for(sample_i in 1:NBOOT) {
-            bsamp <- sample(
-                1:nrow(imps[[imp_i]]), 
-                nrow(imps[[imp_i]]), 
-                replace = TRUE
-            )
-            tbl <- make_decomp_component_table(
-                imps[[imp_i]][bsamp, ], 
-                fam_adj = TRUE, 
-                exclude_alloc = FALSE, 
-                exclude_top_2_pct = FALSE, 
-                exclude_top_decile_female_earners = FALSE, 
-                exclude_top_decile_male_earners = FALSE
-            )
-            decomp_component_list[[imp_i]][[sample_i]] <- 
-                # Row-bind results across decades by imputation index (imp_i)
-                # and bootstrap index (sample_i)
-                rbindlist(
-                    list(
-                        decomp_component_list[[imp_i]][[sample_i]],
-                        tbl
-                    )
+        cat(paste0(yr, "\n####\n\n"))
+        
+        for(imp_i in 1:10) {
+            
+            cat(paste0("Imputation ", imp_i, ", bootstrap: "))
+            
+            for(sample_i in 1:NBOOT) {
+                cat(sample_i, "")
+                bsamp <- sample(
+                    1:nrow(imps[[imp_i]]), 
+                    nrow(imps[[imp_i]]), 
+                    replace = TRUE
                 )
+                tbl <- make_decomp_component_table(
+                    imps[[imp_i]][bsamp, ], 
+                    fam_adj = TRUE, 
+                    exclude_alloc = FALSE, 
+                    exclude_top_2_pct = FALSE, 
+                    exclude_top_decile_female_earners = FALSE, 
+                    exclude_top_decile_male_earners = FALSE
+                )
+                decomp_component_list[[imp_i]][[sample_i]] <- 
+                    # Row-bind results across decades by imputation index (imp_i)
+                    # and bootstrap index (sample_i)
+                    rbindlist(
+                        list(
+                            decomp_component_list[[imp_i]][[sample_i]],
+                            tbl
+                        )
+                    )
+            }
+            
+            cat("\n\n")
+            
         }
         
     }
     
+    # Save decomp_component_list in case we need it and don't want to regenerate it
+    save(
+        decomp_component_list,
+        file = decomp_component_file
+    )
 }
 
-# Save decomp_component_list in case we need it and don't want to regenerate it
-save(
-    decomp_component_list,
-    file = file.path(
-        OUT_DIR, 
-        INTERMEDIATE_OUT_FILE
-    )
-)
+
+
 
 ## Initiate lists of tables 
 ## and run loop to populate the list
@@ -1003,8 +1015,14 @@ save(
 tabs.list <- vector(mode = "list", length = NBOOT)
 #
 # (run loop)
+
+cat("Making tables...\n################\n")
+
 for(i in 1:NBOOT) {
-	## Data 
+	
+    cat(i, "")
+    
+    ## Data 
     # (tables are in "decomp_component_list" created above) 
     # 
     
@@ -1032,13 +1050,7 @@ for(i in 1:NBOOT) {
 	## Tables
 	#
 	# (apply function to get all the tables for a given bootstrap sample)
-    tabs.boot <- do.call(
-        fun.tabs.list, 
-        c(
-            out.decomp.list, 
-            dat.decomp.list
-        )
-    )
+      
 
 	# (append all tables to list of tables from all bootstrap samples)
 	tabs.list[[i]] <- tabs.boot
@@ -1047,7 +1059,7 @@ for(i in 1:NBOOT) {
 
          
 ## Save list of tables
-save(tabs.list,file=OUT_FILE)
+save(tabs.list,file=file.path(OUT_DIR, OUT_FILE))
 
 
 
