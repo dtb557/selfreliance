@@ -1050,7 +1050,13 @@ for(i in 1:NBOOT) {
 	## Tables
 	#
 	# (apply function to get all the tables for a given bootstrap sample)
-      
+    tabs.boot <- do.call(
+        fun.tabs.list, 
+        c(
+            out.decomp.list,
+            dat.decomp.list
+        ) 
+    )
 
 	# (append all tables to list of tables from all bootstrap samples)
 	tabs.list[[i]] <- tabs.boot
