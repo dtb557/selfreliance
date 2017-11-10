@@ -1,0 +1,54 @@
+---
+title: "Components of family income"
+author: "Derek Burk"
+date: "November 9, 2017"
+output: html_document
+---
+
+```{r include=FALSE}
+library(tidyverse)
+library(rvest)
+library(glue)
+library(knitr)
+
+# labern
+labern <- c("incwage", "incbus", "incfarm")
+
+# other_inc
+other <- c("incidr", "incaloth", "incretir", 
+  "incdrt", "incint", "incdivid", 
+  "incrent", "incchild", "incalim", 
+  "incasist", "incother", "incss", 
+  "incwelfr", "incgov", "incssi",
+  "incunemp", "incwkcom", "incvet", 
+  "inceduc", "incdisab", "incsurv")
+
+all <- c(labern, other)
+
+# fam_inc also includes TAXSIM estimated federal income and FICA taxes
+
+url_pattern <- "https://cps.ipums.org/cps-action/variables/{varname}"
+description_selector <- "#description_section p"
+
+get_description <- function(varname) {
+    url <- glue(url_pattern)
+    html <- read_html(url)
+    text <- html_nodes(html, description_selector) %>% html_text()
+    paste(text, collapse = " ")
+}
+
+descriptions <- map_chr(
+    all,
+    get_description
+)
+
+out <- cbind(Variable = all, Description = descriptions)
+```
+
+Family income = 
+    `r paste0(all, collapse = " +\n\t")`
+
+```{r echo=FALSE}
+kable(out)
+```
+
