@@ -1,0 +1,66 @@
+---
+title: "Self-Reliance with Logged Income and Earnings"
+author: "Derek Burk"
+date: "`r Sys.Date()`"
+output: html_notebook
+---
+
+Maybe we can make the table with self-reliance under all four conditions: untransformed, full-distribution; untransformed, top 2% excluded; log-transformed; rank-transformed.
+
+Can we just load an imputed analysis data set and do the transformations from there?
+
+```{r setup}
+library(tidyverse)
+source("../../functions/safe_log.R")
+source("../../functions/fixed_wtd.rank.R")
+source("../../functions/adjust_for_family_size.R")
+source("../../functions/exclude_top_2_pct.R")
+
+IN_DIR <- "../../main/6a_make_analysis_dataset_imputed"
+```
+
+
+
+```{r}
+for(yr in 1970) { #seq(1970, 2010, 10)) {
+    cat(yr, "")
+    imp_file <- sprintf("1_imps_%d_analysis_vars.Rdata", yr)
+    load(file.path(IN_DIR, imp_file))
+    
+    
+    sr_four_ways <- map_dfr(
+        imps, 
+        function(d) {
+            d <- adjust_for_family_size(d)
+            
+            # Compute transformed labern and fam_inc variables
+            d[ , log_labern := safe_log(labern)]
+            d[ , log_fam_inc := safe_log(fam_inc)]
+            d[ , rank_labern := fixed_wtd.rank(labern, weights = wtsupp), by = sex]
+            d[ , rank_fam_inc := fixed_wtd.rank(fam_inc, weights = wtsupp), by = sex]
+            
+            # Compute SR untransformed; SR log transformed; SR rank transformed
+            d[ , sr_raw := weights::wtd.cors(labern, fam_inc, weight=wtsupp)[1], by = sex]
+            d[ , sr_log := weights::wtd.cors(log_labern, fam_inc, weight=wtsupp)[1], by = sex]
+            d[ , sr_rank := weights::wtd.cors(rank_labern, rank_fam_inc, weight=wtsupp)[1], by = sex]
+            d_summary <- d[ , .(
+                sr_raw = sr_raw[1], 
+                sr_log = sr_log[1], 
+                sr_rank = sr_rank[1]
+            ), keyby = sex]
+        
+            # Compute SR untransformed, top 2 pct excluded
+            d <- exclude_top_2_pct(d)
+            
+            d <- d[ , sr_top_2_excluded := weights::wtd.cors(labern, fam_inc, weight=wtsupp)[1], by = sex]
+            d_summary_2 <- d[ , .(sr_top_2_excluded = sr_top_2_excluded[1]), 
+                              keyby = sex]
+            
+            d_summary_2[d_summary][ , year := yr]
+            
+        }
+    )
+    sr_four_ways
+}
+```
+

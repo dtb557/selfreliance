@@ -42,6 +42,6 @@ save_qois_for_tables_and_figs <- function(fam_adj = TRUE,
     }
 }
 
-# save_qois_for_tables_and_figs() # defaults to fam_adj and exclude_top_2_pct
+save_qois_for_tables_and_figs() # defaults to fam_adj and exclude_top_2_pct
 save_qois_for_tables_and_figs(exclude_top_2_pct = FALSE)
 save_qois_for_tables_and_figs(fam_adj = FALSE)

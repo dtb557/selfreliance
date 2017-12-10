@@ -1,6 +1,7 @@
 make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
     
     require(data.table)
+    source("functions/limit_age_range.R")
     
     if(!is.null(data_to_merge)) {
         setkey(data, year, serial, pernum)
@@ -124,7 +125,13 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
     data[ , n_children_under_5 := sum((momloc > 0 | poploc > 0) & age < 5), 
          by=.(year, serial, subfamid)]
     
-    data <- data[pernum==subfamid | pnloc > 0, ]
+    # Flag families with never-married children over age 25
+    setkey(data, year, serial, subfamid)
+    
+    data[ , child_25_or_over := relate == "Child" & age >= 25 & marst == "Never married/single"]
+    data[ , fam_has_adult_child := any(child_25_or_over), by = key(data)]
+    
+    data <- heads_and_partners_only(data)
     
     data[ , n_earners := .sum(posern, pn_posern), by=.(year, serial, pernum)]
     
@@ -167,5 +174,15 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
                     fam_unearned_gov, fam_tax, oth_labern, fam_inc, wtsupp, 
                     full_time_full_year)]
     
+    # Limit to persons 25-54
+    data <- limit_age_range(data)
+    
+    # Set wtsupp to 0 if it is negative (only applies to 56 cases in 1969-1971)
+    data[wtsupp < 0, wtsupp := 0]
+    
     return(data)
+}
+
+heads_and_partners_only <- function(data) {
+    data[pernum == subfamid | pnloc > 0, ]
 }

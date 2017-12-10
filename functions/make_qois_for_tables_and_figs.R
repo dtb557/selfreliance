@@ -32,6 +32,9 @@ make_qois_for_tables_and_figs <- function(data,
     
     data <- limit_age_range(data)
     
+    # Set cases with negative weight values to zero
+    data[wtsupp < 0, wtsupp := 0]
+    
     if(fam_adj) {
         source("functions/adjust_for_family_size.R")
         data <- adjust_for_family_size(data)
@@ -188,7 +191,7 @@ make_qois_for_tables_and_figs <- function(data,
     decomp[ , labern_oth_inc_corr := EP_labern_oth_inc / group_polarity]
     decomp[ , group_wt := group_size / sum(group_size), by=sex]
     
-    if(sum(abs(out$self_reliance$self_reliance - decomp[ , sum(group_corr*group_wt*(group_polarity/(SD_labern*SD_fam_inc))), by=sex][,V1])) > 1e-6) {
+    if(sum(abs(out$self_reliance$self_reliance - decomp[ , sum(group_corr*group_wt*(group_polarity/(SD_labern*SD_fam_inc))), by=sex][,V1])) > 1e-4) {
         stop("Product of components does not equal overall correlations by gender.")
     }
     
