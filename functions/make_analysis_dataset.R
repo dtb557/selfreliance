@@ -131,6 +131,7 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
     data[ , child_25_or_over := relate == "Child" & age >= 25 & marst == "Never married/single"]
     data[ , fam_has_adult_child := any(child_25_or_over), by = key(data)]
     
+    # Remove all but heads and partners
     data <- heads_and_partners_only(data)
     
     data[ , n_earners := .sum(posern, pn_posern), by=.(year, serial, pernum)]
@@ -172,7 +173,7 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
                     n_children_under_5, age, pn_age, educ, race, hispan, 
                     labern, pn_labern, other_inc, fam_unearned_non_gov, 
                     fam_unearned_gov, fam_tax, oth_labern, fam_inc, wtsupp, 
-                    full_time_full_year)]
+                    full_time_full_year, fam_has_adult_child)]
     
     # Limit to persons 25-54
     data <- limit_age_range(data)
