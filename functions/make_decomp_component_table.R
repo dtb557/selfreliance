@@ -1,6 +1,7 @@
 make_decomp_component_table <- function(data, fam_adj = TRUE, exclude_alloc = FALSE, 
              exclude_top_2_pct = TRUE, exclude_top_decile_female_earners = FALSE, 
-             exclude_top_decile_male_earners = FALSE) {
+             exclude_top_decile_male_earners = FALSE, group_var = "fam_structure", 
+             compute_std_corr = FALSE) {
     
     require(Hmisc)
     require(weights)
@@ -51,11 +52,15 @@ make_decomp_component_table <- function(data, fam_adj = TRUE, exclude_alloc = FA
     data[ , mu_pn := wtd.mean(pn_labern, wtsupp), by=key(data)]
     data[ , total_pop := sum(wtsupp), by=key(data)]
     
+    # Compute standardized corr components
+    data[ , dev_gd_mn_x := (labern - mu_x) / sigma_x]
+    data[ , dev_gd_mn_y := (fam_inc - mu_y) / sigma_y]
+    
     # Now consolidate all into group level (sex, year, and fam-structure specific) variables
     data[ , fam_structure := marr_cohab:num_earners]
     data[ , fam_structure := as.factor(as.character(fam_structure))] # get rid of empty category
     
-    setkey(data, sex, decade, fam_structure)
+    setkeyv(data, c("sex", "decade", group_var))
     
     qoi <- data[ , .(
         sigma_x = sigma_x[1],
@@ -76,9 +81,17 @@ make_decomp_component_table <- function(data, fam_adj = TRUE, exclude_alloc = FA
         sigma_gpartner = sqrt(wtd.var(pn_labern, wtsupp)),
         sigma_gother = sqrt(wtd.var(other_inc, wtsupp)),
         cor_xg_partnerg = wtd.cors(labern, pn_labern, wtsupp)[1],
-        cor_xg_otherg = wtd.cors(labern, other_inc, wtsupp)[1]
+        cor_xg_otherg = wtd.cors(labern, other_inc, wtsupp)[1],
+        # Compute standardized corr
+        r_std_g = wtd.mean(dev_gd_mn_x * dev_gd_mn_y, wtsupp) / 
+            (sqrt(wtd.mean(dev_gd_mn_x^2, wtsupp)) * sqrt(wtd.mean(dev_gd_mn_y^2, wtsupp)))
         
     ), by=key(data)]
+    
+    # Remove standardized corr, if not requested
+    if(!compute_std_corr) {
+        qoi[ , r_std_g := NULL]
+    }
     
     qoi[ , cov_xg_partnerg := cor_xg_partnerg*sigma_gx*sigma_gpartner]
     qoi[ , cov_xg_otherg := cor_xg_otherg*sigma_gx*sigma_gother]
