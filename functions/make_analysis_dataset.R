@@ -173,7 +173,7 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
                     n_children_under_5, age, pn_age, educ, race, hispan, 
                     labern, pn_labern, other_inc, fam_unearned_non_gov, 
                     fam_unearned_gov, fam_tax, oth_labern, fam_inc, wtsupp, 
-                    full_time_full_year, fam_has_adult_child)]
+                    full_time_full_year, fam_has_adult_child, race, region)]
     
     # Limit to persons 25-54
     data <- limit_age_range(data)

@@ -23,6 +23,16 @@ load("main/1_clean_data/cleaned_data_step_5.Rdata")
 d <- d[ , .(pce, pnloc, subfamid, momloc, 
             poploc, wtsupp, relate, nchild), keyby=.(year, serial, pernum)]
 
+# Add region
+ddi <- ipumsr::read_ipums_ddi("original_data/add_region.xml")
+region <- ipumsr::read_ipums_micro(ddi, data_file = "original_data/add_region.dat.gz")
+region <- data.table(region)
+setnames(region, names(region), c("year", "serial", "region", "pernum"))
+setkey(region, year, serial, pernum)
+
+d <- region[d]
+rm(region)
+
 for(yr in seq(1970, 2010, 10)) {
     # if(yr==1970) next
     cat(yr, "")

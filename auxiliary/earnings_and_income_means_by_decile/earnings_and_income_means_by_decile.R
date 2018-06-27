@@ -8,7 +8,7 @@ source("functions/adjust_for_family_size.R")
 IN_DIR <- "main/6a_make_analysis_dataset_imputed"
 IN_FILE_PATTERN <- "1_imps_%d_analysis_vars.Rdata"
 OUT_DIR <- "auxiliary/earnings_and_income_means_by_decile"
-OUT_FILE_PATTERN <- "%s_means_by_sex_and_decile_%d.csv"
+OUT_FILE_PATTERN <- "labern_fam_inc_means_by_sex_and_labern_decile_%d_zero_earners_included.csv"
 
 yrs <- c(1970, 2010)
 
@@ -49,76 +49,83 @@ for(yr in yrs) {
                 by = sex
                 ]
             
-            data[
-                fam_inc > 0,
-                fam_inc_decile := make_decile_groups(fam_inc, wtsupp), 
-                by = sex
-                ]
+            data[ 
+                , 
+                labern_decile := ordered(
+                    ifelse(
+                        labern > 0, 
+                        as.character(labern_decile), 
+                        "Zero earners"
+                    ), 
+                    levels = c(
+                        "Zero earners", 
+                        levels(labern_decile)
+                    )
+                )]
+            
+            # data[
+            #     fam_inc > 0,
+            #     fam_inc_decile := make_decile_groups(fam_inc, wtsupp), 
+            #     by = sex
+            #     ]
             
             # Compute means by group
-            labern_means <- 
+            both_means <- 
                 data[
-                    labern > 0,
-                    .(labern_mean = wtd.mean(labern, wtsupp)), 
+                    ,
+                    .(labern_mean = wtd.mean(labern, wtsupp), 
+                      fam_inc_mean = wtd.mean(fam_inc, wtsupp)), 
                     by = .(sex, labern_decile)
                     ]
             
-            fam_inc_means <-
-                data[
-                    fam_inc > 0,
-                    .(fam_inc_mean = wtd.mean(fam_inc, wtsupp)), 
-                    by = .(sex, fam_inc_decile)
-                    ]
-            return(
-                list(
-                    labern_means = labern_means, 
-                    fam_inc_means = fam_inc_means
-                )
-            )
+            # fam_inc_means <-
+            #     data[
+            #         fam_inc > 0,
+            #         .(fam_inc_mean = wtd.mean(fam_inc, wtsupp)), 
+            #         by = .(sex, labern_decile)
+            #         ]
+            return(both_means)
         }
     )
         
-    labern_means <- lapply(
-        out, `[[`, "labern_means"
-    )
-    labern_means <- rbindlist(labern_means)
-    labern_means <- 
-        labern_means[
+    both_means <- rbindlist(out)
+    both_means <- 
+        both_means[
             ,
-            .(labern_mean = mean(labern_mean)), 
+            .(labern_mean = mean(labern_mean), 
+              fam_inc_mean = mean(fam_inc_mean)), 
             by = .(sex, labern_decile)
         ]
     
-    fam_inc_means <- lapply(
-        out, `[[`, "fam_inc_means"
-    )
-    fam_inc_means <- rbindlist(fam_inc_means)
-    fam_inc_means <- 
-        fam_inc_means[
-            ,
-            .(fam_inc_mean = mean(fam_inc_mean)), 
-            by = .(sex, fam_inc_decile)
-        ]
+    # fam_inc_means <- lapply(
+    #     out, `[[`, "fam_inc_means"
+    # )
+    # fam_inc_means <- rbindlist(fam_inc_means)
+    # fam_inc_means <- 
+    #     fam_inc_means[
+    #         ,
+    #         .(fam_inc_mean = mean(fam_inc_mean)), 
+    #         by = .(sex, fam_inc_decile)
+    #     ]
     
     # Save to csv
-    labern_file <- file.path(
+    both_file <- file.path(
         OUT_DIR, 
         sprintf(
             OUT_FILE_PATTERN, 
-            "labern", 
             yr
         )
     )
     
-    fam_inc_file <- file.path(
-        OUT_DIR, 
-        sprintf(
-            OUT_FILE_PATTERN, 
-            "fam_inc", 
-            yr
-        )
-    )
+    # fam_inc_file <- file.path(
+    #     OUT_DIR, 
+    #     sprintf(
+    #         OUT_FILE_PATTERN, 
+    #         "fam_inc", 
+    #         yr
+    #     )
+    # )
     
-    fwrite(labern_means, file = labern_file)
-    fwrite(fam_inc_means, file = fam_inc_file)
+    fwrite(both_means, file = both_file)
+    # fwrite(fam_inc_means, file = fam_inc_file)
 }
