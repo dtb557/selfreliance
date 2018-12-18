@@ -1,4 +1,5 @@
-make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
+make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL, 
+                                  no_cohab = FALSE) {
     
     require(data.table)
     source("functions/limit_age_range.R")
@@ -6,7 +7,7 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
     if(!is.null(data_to_merge)) {
         setkey(data, year, serial, pernum)
         setkey(data_to_merge, year, serial, pernum)
-        data <- d[data]
+        data <- data_to_merge[data]
     }
     
     
@@ -54,7 +55,7 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
             do_string(dss("data[%s < 0, %s := 0L]", c(n, n)))
         }
     }
-
+    
     
     .sum <- function(...) sum(..., na.rm=TRUE)
     
@@ -63,56 +64,56 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
     data[labern < 0, labern := 0L] # labern must not be negative
     
     data[ , unearned_non_gov := as.integer(.sum(incidr, incaloth, incretir, 
-                                               incdrt, incint, incdivid, 
-                                               incrent, incchild, incalim, 
-                                               incasist, incother)), 
-         by=.(year, serial, pernum)]
+                                                incdrt, incint, incdivid, 
+                                                incrent, incchild, incalim, 
+                                                incasist, incother)), 
+          by=.(year, serial, pernum)]
     
     data[ , unearned_gov := as.integer(.sum(incss, incwelfr, incgov, incssi,
-                                           incunemp, incwkcom, incvet, 
-                                           inceduc, incdisab, incsurv)), 
-         by=.(year, serial, pernum)]
+                                            incunemp, incwkcom, incvet, 
+                                            inceduc, incdisab, incsurv)), 
+          by=.(year, serial, pernum)]
     
     if("posern" %in% names(data)) data[ , posern := NULL]
     
     data[ , posern := labern > 0]
     
     data[ , inctot := as.integer(.sum(incwage, incbus, incfarm, incss, incwelfr, incgov, 
-                                     incidr, incaloth, incretir, incssi, incdrt, incint,
-                                     incunemp, incwkcom, incvet, incdivid, incrent, 
-                                     inceduc, incchild, incalim, incasist, incother, 
-                                     incdisab, incsurv)), 
-         by=.(year, serial, pernum)]
+                                      incidr, incaloth, incretir, incssi, incdrt, incint,
+                                      incunemp, incwkcom, incvet, incdivid, incrent, 
+                                      inceduc, incchild, incalim, incasist, incother, 
+                                      incdisab, incsurv)), 
+          by=.(year, serial, pernum)]
     
     if(any(is.na(data$inctot))) stop(sprintf("inctot has NA values in decade %d", yr))
     
     data[ , tax := -as.integer(round((fed_inc_tax_not_inflation_adj+fica_not_inflation_adj)*100/pce))]
     
     partner <- data[pnloc > 0, .(year, serial, pernum=pnloc, pn_labern=labern, 
-                                pn_posern=posern, pn_age=age)]
+                                 pn_posern=posern, pn_age=age)]
     setkey(partner, year, serial, pernum)
     setkey(data, year, serial, pernum)
     data <- partner[data]
     
     data[ , fam_unearned_non_gov := .sum(unearned_non_gov), 
-         by=.(year, serial, subfamid)]
+          by=.(year, serial, subfamid)]
     data[ , fam_unearned_gov := .sum(unearned_gov), 
-         by=.(year, serial, subfamid)]
+          by=.(year, serial, subfamid)]
     data[ , fam_tax := .sum(tax), by=.(year, serial, subfamid)]
     data[ , hd_1_labern := labern[pernum==subfamid], 
-         by=.(year, serial, subfamid)]
+          by=.(year, serial, subfamid)]
     data[ , hd_2_labern := labern[pernum!=subfamid & pnloc > 0], 
-         by=.(year, serial, subfamid)]
+          by=.(year, serial, subfamid)]
     data[ , oth_labern := .sum(labern[pernum!=subfamid & pnloc==0]), 
-         by=.(year, serial, subfamid)]
+          by=.(year, serial, subfamid)]
     
     data[ , other_inc := as.integer(.sum(fam_unearned_non_gov, 
-                                        fam_unearned_gov, 
-                                        fam_tax, 
-                                        oth_labern)), by=.(year, serial, pernum)]
+                                         fam_unearned_gov, 
+                                         fam_tax, 
+                                         oth_labern)), by=.(year, serial, pernum)]
     
     data[ , fam_inc := .sum(hd_1_labern, hd_2_labern, other_inc), 
-         by=.(year, serial, pernum)]
+          by=.(year, serial, pernum)]
     
     # Count how many families have negative income, and remove them
     neg_fam_inc <- nrow(data[ , .(fam_inc=fam_inc[1]), by=.(year, serial, subfamid)][fam_inc < 0,])
@@ -120,10 +121,10 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
     data <- data[fam_inc >= 0, ]
     
     data[ , n_children_under_18 := sum((momloc > 0 | poploc > 0) & age < 18), 
-         by=.(year, serial, subfamid)]
+          by=.(year, serial, subfamid)]
     
     data[ , n_children_under_5 := sum((momloc > 0 | poploc > 0) & age < 5), 
-         by=.(year, serial, subfamid)]
+          by=.(year, serial, subfamid)]
     
     # Flag families with never-married children over age 25
     setkey(data, year, serial, subfamid)
@@ -168,12 +169,22 @@ make_analysis_dataset <- function(data, imputed=FALSE, data_to_merge=NULL) {
     # Can't be full_time_full_year if incwage, incbus, and incfarm are all zero
     data[ , full_time_full_year := full_time_full_year & (incwage != 0 | incbus != 0 | incfarm != 0)]
     
+    # Use cohabp1 and cohabp2 to create pn_age for cohabitors when cohabitation is
+    # ignored, so that we can exclude the same people we would have based on partner
+    # age
+    if (no_cohab) {
+        data[ , cohabp1_age := age[cohabp1], by = .(year, serial)]
+        data[ , cohabp2_age := age[cohabp2], by = .(year, serial)]
+        data[data$cohabp1, pn_age := cohabp2_age]
+        data[data$cohabp2, pn_age := cohabp1_age]
+    }
+    
     data <- data[ , .(year, serial, pernum, subfamid, pnloc, sex, marr_cohab, 
-                    num_earners, group, sqrt_famsize, n_children_under_18,
-                    n_children_under_5, age, pn_age, educ, race, hispan, 
-                    labern, pn_labern, other_inc, fam_unearned_non_gov, 
-                    fam_unearned_gov, fam_tax, oth_labern, fam_inc, wtsupp, 
-                    full_time_full_year, fam_has_adult_child)]
+                      num_earners, group, sqrt_famsize, n_children_under_18,
+                      n_children_under_5, age, pn_age, educ, race, hispan, 
+                      labern, pn_labern, other_inc, fam_unearned_non_gov, 
+                      fam_unearned_gov, fam_tax, oth_labern, fam_inc, wtsupp, 
+                      full_time_full_year, fam_has_adult_child, race, region)]
     
     # Limit to persons 25-54
     data <- limit_age_range(data)

@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="ipums-ddi-xslt.xsl"?>
+<codeBook xmlns="ddi:codebook:2_5" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="ddi:codebook:2_5 http://www.ddialliance.org/Specification/DDI-Codebook/2.5/XMLSchema/codebook.xsd" version="2.5" ID="ddi2-107770_cps_00020.dat-cps.ipums.org">
+  <docDscr>
+    <citation>
+      <titlStmt>
+        <titl>Codebook for an IPUMS-CPS Data Extract</titl>
+        <subTitl>DDI 2.5 metadata describing the extract file  'cps_00020.dat'</subTitl>
+        <IDNo>ddi2-107770_cps_00020.dat-cps.ipums.org</IDNo>
+      </titlStmt>
+      <rspStmt>
+        <AuthEnty affiliation="University of Minnesota">Minnesota Population Center</AuthEnty>
+      </rspStmt>
+      <prodStmt>
+        <producer abbr="MPC" affiliation="University of Minnesota" role="Documentation">Minnesota Population Center</producer>
+        <prodDate date="2018-01-05">January 5, 2018</prodDate>
+        <prodPlac>Minnesota Population Center, 50 Willey Hall, 225 - 19th Avenue South, Minneapolis, MN 55455</prodPlac>
+      </prodStmt>
+      <distStmt>
+        <contact affiliation="University of Minnesota" URI="http://pop.umn.edu">Minnesota Population Center</contact>
+      </distStmt>
+    </citation>
+  </docDscr>
+  <stdyDscr>
+    <citation>
+      <titlStmt>
+        <titl>User Extract cps_00020.dat</titl>
+      </titlStmt>
+      <rspStmt>
+        <AuthEnty affiliation="University of Minnesota">Minnesota Population Center</AuthEnty>
+      </rspStmt>
+      <prodStmt>
+        <producer abbr="MPC" affiliation="University of Minnesota" role="Documentation">Minnesota Population Center</producer>
+        <prodDate date="2018-01-05">January 5, 2018</prodDate>
+        <prodPlac>Minnesota Population Center, 50 Willey Hall, 225 - 19th Avenue South, Minneapolis, MN 55455</prodPlac>
+      </prodStmt>
+      <distStmt>
+        <contact affiliation="University of Minnesota" URI="http://pop.umn.edu">Minnesota Population Center</contact>
+      </distStmt>
+      <serStmt>
+        <serName abbr="cps">IPUMS-CPS</serName>
+        <serInfo>DOI:10.18128/D030.V5.0</serInfo>
+      </serStmt>
+      <verStmt>
+        <version date="2018-01-05"/>
+      </verStmt>
+    </citation>
+    <stdyInfo>
+      <subject>
+        <topcClas vocab="IPUMS">Technical Variables -- HOUSEHOLD</topcClas>
+        <topcClas vocab="IPUMS">Geographic Variables -- HOUSEHOLD</topcClas>
+        <topcClas vocab="IPUMS">Technical Variables -- PERSON</topcClas>
+      </subject>
+      <sumDscr ID="sdatref-2327">
+        <timePrd event="single" date="1969-03">1969-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2328">
+        <timePrd event="single" date="1970-03">1970-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2329">
+        <timePrd event="single" date="1971-03">1971-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2337">
+        <timePrd event="single" date="1979-03">1979-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2338">
+        <timePrd event="single" date="1980-03">1980-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2339">
+        <timePrd event="single" date="1981-03">1981-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2347">
+        <timePrd event="single" date="1989-03">1989-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2348">
+        <timePrd event="single" date="1990-03">1990-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2349">
+        <timePrd event="single" date="1991-03">1991-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2357">
+        <timePrd event="single" date="1999-03">1999-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2358">
+        <timePrd event="single" date="2000-03">2000-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2359">
+        <timePrd event="single" date="2001-03">2001-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2368">
+        <timePrd event="single" date="2009-03">2009-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2369">
+        <timePrd event="single" date="2010-03">2010-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <sumDscr ID="sdatref-2467">
+        <timePrd event="single" date="2011-03">2011-03</timePrd>
+        <nation abbr="us">United States</nation>
+      </sumDscr>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 1969; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 1970; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 1971; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 1979; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 1980; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 1981; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 1989; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 1990; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 1991; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 1999; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 2000; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 2001; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 2009; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 2010; regular size
+]]></notes>
+      <notes><![CDATA[Additional notes on a sample that is part of this study:  IPUMS-CPS, ASEC 2011; regular size
+]]></notes>
+    </stdyInfo>
+    <dataAccs>
+      <useStmt>
+        <confDec required="no"><![CDATA[None]]></confDec>
+        <contact affiliation="Minnesota Population Center" URI="http://cps.ipums.org/">IPUMS-CPS</contact>
+        <citReq><![CDATA[Publications and research reports based on the IPUMS-CPS database must cite it appropriately. The citation should include the following:
+
+Sarah Flood, Miriam King, Steven Ruggles, and J. Robert Warren. Integrated Public Use Microdata Series, Current Population Survey: Version 5.0 [dataset]. Minneapolis, MN: University of Minnesota, 2017. https://doi.org/10.18128/D030.V5.0
+
+The licensing agreement for use of IPUMS-CPS data requires that users supply us with the title and full citation for any publications, research reports, or educational materials making use of the data or documentation. Please add your citation to the IPUMS bibliography: http://bibliography.ipums.org/]]></citReq>
+        <conditions><![CDATA[Users of IPUMS-CPS data must agree to abide by the conditions of use. A user's license is valid for one year and may be renewed.  Users must agree to the following conditions:
+
+(1) No fees may be charged for use or distribution of the data.  All persons are granted a limited license to use these data, but you may not charge a fee for the data if you distribute it to others.
+
+(2) Cite IPUMS appropriately.  For information on proper citation,  refer to the citation requirement section of this DDI document.
+
+(3) Tell us about any work you do using the IPUMS.  Publications, research  reports, or presentations making use of IPUMS-CPS should be added to our  Bibliography. Continued funding for the IPUMS depends on our ability to  show our sponsor agencies that researchers are using the data for productive  purposes.
+
+(4) Use it for GOOD -- never for EVIL.]]></conditions>
+        <disclaimer>The user of the data acknowledges that the original collector of the data, the authorized distributor of the data, and the relevant funding agency bear no responsibility for use of the data or for interpretations or inferences based upon such uses.</disclaimer>
+      </useStmt>
+    </dataAccs>
+    <notes><![CDATA[User-provided description:  Add region to data]]></notes>
+  </stdyDscr>
+  <fileDscr ID="ExtractData">
+    <fileTxt>
+      <fileName>cps_00020.dat</fileName>
+      <fileCont>Microdata records</fileCont>
+      <fileStrc type="rectangular">
+      </fileStrc>
+      <fileType charset="ISO-8859-1">ISO-8859-1 data file</fileType>
+      <format>fixed length fields</format>
+      <filePlac>Minnesota Population Center, 50 Willey Hall, 225 - 19th Avenue South, Minneapolis, MN 55455</filePlac>
+    </fileTxt>
+  </fileDscr>
+  <dataDscr>
+    <var ID="YEAR" files="ExtractData" name="YEAR" intrvl="contin" dcml="0">
+      <location StartPos="1" width="4" EndPos="4"/>
+      <labl>Survey year</labl>
+      <txt><![CDATA[YEAR reports the year in which the survey was conducted.  YEARP is repeated on person records.]]></txt>
+      <codInstr><![CDATA[
+YEAR is a 4-digit numeric value.]]></codInstr>
+      <concept vocab="IPUMS">Technical Variables -- HOUSEHOLD</concept>
+      <varFormat schema="other" type="numeric"/>
+    </var>
+    <var ID="SERIAL" files="ExtractData" name="SERIAL" intrvl="contin" dcml="0">
+      <location StartPos="5" width="5" EndPos="9"/>
+      <labl>Household serial number</labl>
+      <txt><![CDATA[SERIAL is an identifying number unique to each household in a given survey month and year.  All person records are assigned the same serial number as the household record they follow.  A combination of YEAR, MONTH, and SERIAL provides a within-sample unique identifier for every household in IPUMS-CPS; YEAR, SERIAL, and PERNUM uniquely identify every person in the database within sample.
+
+SERIAL is a new value generated for IPUMS-CPS and should not be confused with the household serial number created by the Census Bureau and included in the original CPS data.]]></txt>
+      <codInstr><![CDATA[
+SERIAL is a 5-digit numeric variable.]]></codInstr>
+      <concept vocab="IPUMS">Technical Variables -- HOUSEHOLD</concept>
+      <varFormat schema="other" type="numeric"/>
+    </var>
+    <var ID="REGION" files="ExtractData" name="REGION" intrvl="discrete" dcml="0">
+      <location StartPos="10" width="2" EndPos="11"/>
+      <labl>Region and division</labl>
+      <txt><![CDATA[REGION identifies the region and division where the housing unit was located. Unless otherwise noted in the comparability discussion, states are recoded into the following 1990 regional and divisional classification system: 
+
+1. Northeast Region
+New England Division: Connecticut, Maine, Massachusetts, New Hampshire, Rhode Island, Vermont
+Middle Atlantic Division: New Jersey, New York, Pennsylvania 
+2. Midwest (formerly North Central) Region
+East North Central Division: Illinois, Indiana, Michigan, Ohio, Wisconsin
+West North Central Division: Iowa, Kansas, Minnesota, Missouri, Nebraska, North Dakota, South Dakota 
+3. South Region
+ South Atlantic Division: Delaware, District of Columbia, Florida, Georgia, Maryland, North Carolina, South Carolina, Virginia, West Virginia
+East South Central Division: Alabama, Kentucky, Mississippi, Tennessee
+West South Central Division: Arkansas, Louisiana , Oklahoma, Texas 
+4. West Region
+Mountain Division: Arizona, Colorado, Idaho, Montana, Nevada, New Mexico, Utah, Wyoming
+Pacific Division: Alaska, California, Hawaii, Oregon, Washington]]></txt>
+      <catgry>
+        <catValu>97</catValu>
+        <labl>State not identified</labl>
+      </catgry>
+      <catgry>
+        <catValu>42</catValu>
+        <labl>Pacific Division</labl>
+      </catgry>
+      <catgry>
+        <catValu>41</catValu>
+        <labl>Mountain Division</labl>
+      </catgry>
+      <catgry>
+        <catValu>33</catValu>
+        <labl>West South Central Division</labl>
+      </catgry>
+      <catgry>
+        <catValu>32</catValu>
+        <labl>East South Central Division</labl>
+      </catgry>
+      <catgry>
+        <catValu>31</catValu>
+        <labl>South Atlantic Division</labl>
+      </catgry>
+      <catgry>
+        <catValu>22</catValu>
+        <labl>West North Central Division</labl>
+      </catgry>
+      <catgry>
+        <catValu>21</catValu>
+        <labl>East North Central Division</labl>
+      </catgry>
+      <catgry>
+        <catValu>12</catValu>
+        <labl>Middle Atlantic Division</labl>
+      </catgry>
+      <catgry>
+        <catValu>11</catValu>
+        <labl>New England Division</labl>
+      </catgry>
+      <concept vocab="IPUMS">Geographic Variables -- HOUSEHOLD</concept>
+      <varFormat schema="other" type="numeric"/>
+    </var>
+    <var ID="PERNUM" files="ExtractData" name="PERNUM" intrvl="contin" dcml="0">
+      <location StartPos="12" width="2" EndPos="13"/>
+      <labl>Person number in sample unit</labl>
+      <txt><![CDATA[PERNUM numbers all persons within each household consecutively (starting with "1") in the order in which they are listed in the original CPS data.  When combined with YEAR , MONTH, and SERIAL, PERNUM uniquely identifies each person within IPUMS-CPS samples, though not across IPUMS-CPS samples.]]></txt>
+      <codInstr><![CDATA[
+PERNUM is a 2-digit numeric variable.]]></codInstr>
+      <concept vocab="IPUMS">Technical Variables -- PERSON</concept>
+      <varFormat schema="other" type="numeric"/>
+    </var>
+  </dataDscr>
+</codeBook>

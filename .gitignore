@@ -1,7 +1,11 @@
 .Rproj.user
-.Rhistory
+*.Rhistory
 .RData
 .Ruserdata
 *.Rdata
 *.dta
-original_data/
+*.csv
+!original_data/*.Rdata
+!original_data/*.dta
+!original_data/*.csv
+*.xlsx
