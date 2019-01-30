@@ -43,7 +43,7 @@ rm(region)
 for(yr in seq(1970, 2010, 10)) {
     # if(yr==1970) next
     cat(yr, "")
-    load(sprintf("main/5_fix_pre_imputation_problems/2_imp_%d_post_tax_fixed_no_cohab.Rdata", yr))
+    load(sprintf("main/5_make_no_cohab_datasets/1_imp_%d_post_tax_no_cohab.Rdata", yr))
     imps <- map(1:10, function(i) {
         # for(n in c("schlcoll", "srcearn", "filestat")) {
         #     do_string(dss("imp[ , %s := NULL]", n))

@@ -36,7 +36,7 @@ rm(region)
 for(yr in seq(1970, 2010, 10)) {
     # if(yr==1970) next
     cat(yr, "")
-    load(sprintf("main/5_fix_pre_imputation_problems/1_imp_%d_post_tax_fixed.Rdata", yr))
+    load(sprintf("main/4a_estimate_taxes_and_transfers_imputed/6_imp_post_tax_%d.Rdata", yr))
     imps <- lapply(1:10, function(i) {
         # for(n in c("schlcoll", "srcearn", "filestat")) {
         #     do_string(dss("imp[ , %s := NULL]", n))
