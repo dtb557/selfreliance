@@ -9,3 +9,4 @@
 !original_data/*.dta
 !original_data/*.csv
 *.xlsx
+*.html
