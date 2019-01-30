@@ -1,4 +1,4 @@
-# Fix sqrt_famsize
+# Make no cohab datasets
 library(magrittr)
 library(dplyr)
 library(data.table)
@@ -94,11 +94,6 @@ split_cohab <- function(data) {
     # setkey(data, year, serial, subfamid)
     # nrow(data[ , .(npersons = .N), by = key(data)])
     
-    # Fix sqrt_famsize again
-    # data[ , sqrt_famsize := NULL]
-    # setkey(data, year, serial, subfamid)
-    # data[ , sqrt_famsize := sqrt(.N), by = key(data)]
-    
     data
 }
 
@@ -115,14 +110,10 @@ for(yr in seq(1970, 2010, by=10)) {
     load(file.path("main/4a_estimate_taxes_and_transfers_imputed", 
                    sprintf("6_imp_post_tax_%d.Rdata", yr)))
     orig_names <- names(imp$data)
-    orig_names[orig_names == "sqrt_famsize"] <- "sqrt_hh_size"
     imp$data <- imp$data %>%
-        rename(sqrt_hh_size = sqrt_famsize) %>%
-        select(-marr_cohab) %>%
+        select(-marr_cohab, -sqrt_famsize) %>%
         left_join(fixed_sqrt_famsize, by=c("year", "serial", "pernum")) %>%
-        select_at(c(orig_names, "sqrt_famsize", "pnloc", "subfamid"))
-    names(imp$imp)[names(imp$imp) == "sqrt_famsize"] <- "sqrt_hh_size"
-    imp$imp <- c(imp$imp, list(sqrt_famsize = NULL, pnloc = NULL, 
-                               subfamid = NULL))
-    save(imp, file=sprintf("main/5_fix_pre_imputation_problems/2_imp_%d_post_tax_fixed_no_cohab.Rdata", yr))
+        select_at(c(orig_names, "pnloc", "subfamid"))
+    imp$imp <- c(imp$imp, list(pnloc = NULL, subfamid = NULL))
+    save(imp, file=sprintf("main/5_make_no_cohab_datasets/1_imp_%d_post_tax_no_cohab.Rdata", yr))
 }
