@@ -63,4 +63,3 @@ for(yr in 1970) { #seq(1970, 2010, 10)) {
     sr_four_ways
 }
 ```
-
