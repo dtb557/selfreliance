@@ -1,7 +1,5 @@
 library(data.table)
 
-#setwd("../../")
-
 norm_approx <- function(x) {
     m <- mean(x, na.rm=TRUE)
     s <- sd(x, na.rm=TRUE)
@@ -21,7 +19,7 @@ d <- d[ , is_numeric_not_topcode_not_id_var(names(d)), with=FALSE]
 d <- d[!is.na(inctot), ]
 
 # Make histograms with Normal density lines
-dist_dir <- "main/2_prepare_for_imputation/variable_distributions"
+dist_dir <- "main/2_prepare_for_imputation/1_variable_distributions"
 if(!dir.exists(dist_dir)) dir.create(dist_dir)
 for(yr in seq(1970, 2010, 10)) {
     for(v in names(d)) {
