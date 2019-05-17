@@ -5,6 +5,8 @@
 *.Rdata
 *.dta
 *.csv
+*.png
+!main/2_prepare_for_imputation/1_variable_distributions/variable_transformations.csv
 !original_data/*.Rdata
 !original_data/*.dta
 !original_data/*.csv
