@@ -10,13 +10,13 @@
 # 6. age_group_by_sex
 # 7. sqrt_famsize
 
-#setwd("../")
 
 always_include <- c("sex", "group", "labern", "pn_labern", "subfaminc", 
                     "age_group_by_sex", "sqrt_famsize")
 
 library(data.table)
 library(nnet)
+library(stringr)
 
 dss <- function(text, subs) {
     split = strsplit(text, "%s")[[1]]
@@ -74,24 +74,38 @@ d[!grepl("^Self-employed|^niu$", classwly) & !is.na(classwly), classwly := "Not 
 d[grepl("^Self-employed", classwly) & !is.na(classwly), classwly := "Self-employed"]
 d[ , classwly := as.factor(classwly)] 
 
-# Load statistics
-load_into_list <- function(file, object_name) {
-    out <- vector(mode="list", length=5)
-    years <- seq(1970, 2010, 10)
-    for(i in 1:5) {
-        load(gsub(".Rdata", paste0("_", years[i], ".Rdata"),file, fixed=TRUE), envir=sys.frame(1))
-        out[[i]] <- get(object_name)
-    }
-    return(out)
-}
 
 stats_dir <- "main/2_prepare_for_imputation"
 
-corr_list_list <- load_into_list(file.path(stats_dir, "corr_list.Rdata"), "corr_list")
-cramers_v_list <- load_into_list(file.path(stats_dir, "cramers_v.Rdata"), "cramers_v_mtrx")
-r_squared_list <- load_into_list(file.path(stats_dir, "new_r_squared_mtrx.Rdata"), "r_squared_mtrx")
-NA_r_squared_list <- load_into_list(file.path(stats_dir, "NA_r_squared_mtrx.Rdata"), "NA_r_squared_mtrx")
-puc_list <- load_into_list(file.path(stats_dir, "puc.Rdata"), "puc")
+corr_list_list <- vector(mode = "list", length = 5)
+cramers_v_list <- vector(mode = "list", length = 5)
+r_squared_list <- vector(mode = "list", length = 5)
+NA_r_squared_list <- vector(mode = "list", length = 5)
+puc_list <- vector(mode = "list", length = 5)
+
+yrs <- seq(1970, 2010, 10)
+for (i in 1:5) {
+    files <- file.path(
+        stats_dir,
+        c(
+            "2_corr_list.Rdata", 
+            "2_cramers_v.Rdata", 
+            "2_new_r_squared_mtrx.Rdata", 
+            "2_NA_r_squared_mtrx.Rdata",
+            "2_puc.Rdata"
+        )
+    )
+    for (f in files) {
+        load(str_replace(f, "\\.Rdata", paste0("_", yrs[i], ".Rdata")))
+    }
+    corr_list_list[[i]] <- corr_list
+    cramers_v_list[[i]] <- cramers_v_mtrx
+    r_squared_list[[i]] <- r_squared_mtrx
+    NA_r_squared_list[[i]] <- NA_r_squared_mtrx
+    puc_list[[i]] <- puc
+    rm(corr_list, cramers_v_mtrx, r_squared_mtrx, NA_r_squared_mtrx, puc)
+}
+
 
 # Symmetrize Cramer's V matrix
 cramers_v_list <- lapply(cramers_v_list, function(x) {

@@ -1,10 +1,13 @@
-AI <- tail(commandArgs(), 1)
-NAI <- as.numeric(AI)
+# AI <- tail(commandArgs(), 1)
+# NAI <- as.numeric(AI)
+
+NAI <- 1
 
 A_YEAR <- seq(1970, 2010, 10)[NAI]
 
 # Get full corr matrix and Cramer's V matrix
 library(data.table)
+library(mice)
 
 dss <- function(text, subs) {
 	split = strsplit(text, "%s")[[1]]
@@ -190,9 +193,23 @@ if(!file.exists(corr_file)) {
 
 # R-squared for race, educ, hispan, and sex
 rsq_file <- file.path(out_dir, sprintf("2_new_r_squared_mtrx_%d.Rdata", A_YEAR))
+
 if(!file.exists(rsq_file)) {
 
-	get_r_squared <- function(yname, xname) {
+# 	r_squared_mtrx <- matrix(
+# 	    NA_real_, 
+# 	    nrow = length(factor_analysis_vars),
+#         ncol = length(quant_analysis_vars),
+# 	    dimnames = list(factor_analysis_vars, quant_analysis_vars)
+#     )
+# 	
+# 	for (fav in factor_analysis_vars) {
+# 	    for (qav in quant_analysis_vars) {
+# 	        r_squared_mtrx[fav, qav] <- get_r_squared(qav, fav)
+# 	    }
+# 	}
+    
+    get_r_squared <- function(yname, xname) {
 		try(return(do_string(dss("summary(lm(%s ~ %s, data=d))$r.squared", c(yname, xname)))))
 		return(0)
 	}
@@ -232,7 +249,7 @@ if(!file.exists(crv_file)) {
 		}
 	}
 	
-	save(cramers_v_mtrx, file=dss("2_cramers_v_%s.Rdata", A_YEAR))
+	save(cramers_v_mtrx, file=crv_file)
 	rm(cramers_v_mtrx, cramers_v)
 
 }
@@ -265,7 +282,6 @@ if(!file.exists(narsq_file)) {
 puc_file <- file.path(out_dir, sprintf("2_puc_%d.Rdata", A_YEAR))
 if(!file.exists(puc_file)) {
 
-	library(mice)
 	p <- md.pairs(d)
 	puc <- p$mr/(p$mr + p$mm)
 	save(puc, file=puc_file)
