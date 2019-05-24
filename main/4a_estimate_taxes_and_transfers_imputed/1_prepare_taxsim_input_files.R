@@ -4,6 +4,10 @@
 library(data.table)
 library(mice)
 
+taxsim_input_dir <- "main/4a_estimate_taxes_and_transfers_imputed/1_taxsim_input"
+
+if (!dir.exists(taxsim_input_dir)) dir.create(taxsim_input_dir)
+
 dss <- function(text, subs) {
     split = strsplit(text, "%s")[[1]]
     if(grepl("%s$", text)) split <- c(split, "")
@@ -22,7 +26,7 @@ source("functions/make_taxsim_dataset.R")
 load("main/1_clean_data/cleaned_data_step_5.Rdata")
 
 vars_to_add <- d[ , .(year, serial, pernum, momloc, poploc, sploc, nchild, relate, 
-            pce)] #, schlcoll, srcearn)]
+            pce)]
 
 setkey(vars_to_add, year, serial, pernum)
 
@@ -74,9 +78,13 @@ for(yr in c(1970, 1980, 1990, 2000, 2010)) {
               by=.(year, serial, pernum)]
         out <- make_taxsim_dataset(copy(dimp))
         out <- rbind(c(9, 85, 2, rep(0, 19)), as.matrix(out))
-        write.table(out, file=paste0("main/4a_estimate_taxes_and_transfers_imputed/1_taxsim_input/sr", yr, "_", i), row.names=FALSE, 
-                    col.names=FALSE)
+        write.table(
+            out, 
+            file = file.path(taxsim_input_dir, paste0("sr", yr, "_", i)), 
+            row.names = FALSE, 
+            col.names = FALSE
+        )
     }
-    rm(list=c("dimp", paste0("dimp_", yr)))
+    rm(dimp)
     cat("\n")
 }
