@@ -89,9 +89,6 @@ rm(imp_vars)
 # Create other_inc
 d[ , other_inc := subfaminc-labern-pn_labern]
 
-# Get rid of empty levels in age_group_by_sex
-d[ , age_group_by_sex := as.factor(as.character(age_group_by_sex))]
-
 age_group_levels <- c(tail(levels(d$age_group), 1), head(levels(d$age_group), -1))
 d[ , age_group := ordered(age_group, levels=age_group_levels)]
 
