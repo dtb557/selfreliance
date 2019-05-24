@@ -1,4 +1,5 @@
-require(car)
+library(car)
+library(MASS)
 
 modified_qqPlot <- function (x, xlab = paste(distribution, "Quantiles"), ylab = paste("Studentized Residuals(", 
                                                                    deparse(substitute(x)), ")", sep = ""), 

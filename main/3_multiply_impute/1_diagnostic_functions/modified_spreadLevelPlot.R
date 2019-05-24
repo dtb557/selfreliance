@@ -1,4 +1,5 @@
-require(car)
+library(car)
+library(MASS)
 
 modified_spreadLevelPlot <- function(x, robust.line = TRUE, xlab = "Fitted Values", 
                                      ylab = "Absolute Studentized Residuals", 

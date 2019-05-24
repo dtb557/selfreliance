@@ -1,19 +1,22 @@
 AI <- tail(commandArgs(), 1)
 NAI <- as.numeric(AI)
 
+error_dir <- "main/3_multiply_impute/1_error_dump"
+if (!dir.exists(error_dir)) dir.create(error_dir)
+
 options(error = quote(dump.frames("main/3_multiply_impute/1_error_dump/error_dump", TRUE)))
 
-# NAI <- 5
+# NAI <- 1
 
 A_YEAR <- as.integer(seq(1970, 2010, 10)[NAI])
-
-setwd("../")
 
 # Run full imputation
 library(data.table)
 library(mice)
 library(stringr)
 library(pscl)
+library(msm)
+library(MASS)
 
 source("main/3_multiply_impute/1_diagnostic_functions/modified_qqPlot.R")
 source("main/3_multiply_impute/1_diagnostic_functions/modified_spreadLevelPlot.R")
@@ -29,6 +32,16 @@ dss <- function(text, subs) {
 
 do_string <- function(x) {
     eval(parse(text=x), envir=parent.frame())
+}
+
+output_dir <- "main/3_multiply_impute/output" 
+coefs_dir <- file.path(output_dir, "coefs")
+diag_dir <- file.path(output_dir, "imp_diagnostics")
+tnorm_dir <- file.path(diag_dir, "from_tnorm")
+coefs_yr_dir <- file.path(coefs_dir, A_YEAR)
+
+for (.dir in c(output_dir, coefs_dir, diag_dir, tnorm_dir, coefs_yr_dir)) {
+    if (!dir.exists(.dir)) dir.create(.dir)
 }
 
 load("main/1_clean_data/cleaned_data_step_5.Rdata") # returns data as d
@@ -296,7 +309,13 @@ mice.impute.tnorm <- function (y, ry, x, tc_matrix=tcm, varname=get("vname", env
         expr <- expression(glm.fit(aug$x[aug$ry, ], aug$y[aug$ry], family = binomial(link = logit), 
                                    weights = aug$w[aug$ry]))
         fit <- suppressWarnings(eval(expr))
-        # save(fit, file=sprintf("output/coefs/%s_zeros_%d_%d.Rdata", varname, imp_n, iter))
+        # save(
+        #     fit, 
+        #     file = file.path(
+        #         coefs_dir,
+        #         sprintf("%s_zeros_%d_%d.Rdata", varname, imp_n, iter)
+        #     )
+        # )
         mcf <- mcfaddens_glm(fit, aug$y[aug$ry])
         cat("\nLogreg pseudo-r-squared =", mcf, ".")
         fit.sum <- summary.glm(fit)
@@ -306,8 +325,14 @@ mice.impute.tnorm <- function (y, ry, x, tc_matrix=tcm, varname=get("vname", env
             beta <- beta[!is.na(beta)]
         }
         rv <- t(chol(sym(fit.sum$cov.unscaled)))
-	for_ppc <- list(beta=beta, fit.sum_cov.unscaled=fit.sum$cov.unscaled)
-	save(for_ppc, file=sprintf("output/coefs/%d/%s_zeros_%d_%d.Rdata", A_YEAR, varname, imp_n, iter))
+	    for_ppc <- list(beta=beta, fit.sum_cov.unscaled=fit.sum$cov.unscaled)
+	    save(
+	        for_ppc, 
+	        file = file.path(
+	            coefs_yr_dir,
+	            sprintf("%s_zeros_%d_%d.Rdata", varname, imp_n, iter)
+            )
+	    )
         beta.star <- beta + rv %*% rnorm(ncol(rv))
         p <- 1/(1 + exp(-(aug$x[!aug$ry, ] %*% beta.star)))
         mis_non_zero <- (runif(nrow(p)) <= p)[,1]
@@ -320,8 +345,6 @@ mice.impute.tnorm <- function (y, ry, x, tc_matrix=tcm, varname=get("vname", env
         mis_non_zero <- rep(TRUE, sum(!ry))
         obs_non_zero <- rep(TRUE, length(y))
     }
-    
-    require(msm)
 
     x <- cbind(1, as.matrix(x))
     if(needs_transform[varname] == "y") {
@@ -337,7 +360,7 @@ mice.impute.tnorm <- function (y, ry, x, tc_matrix=tcm, varname=get("vname", env
 	mn <- x[!ry, ] %*% parm$beta
         non_zero_imputed <- numeric(length(mn))
 	for(i in seq_along(mn)) {
-		non_zero_imputed[i] <- rtnorm(mean=mn[i], lower=topcodes[i], n=1, sd=parm$sigma)
+		non_zero_imputed[i] <- msm::rtnorm(mean=mn[i], lower=topcodes[i], n=1, sd=parm$sigma)
 	}
         if(needs_transform[varname] == "y") non_zero_imputed <- exp(non_zero_imputed) - adjustments[varname]
         non_zero_imputed[!mis_non_zero] <- 0
@@ -349,7 +372,13 @@ mice.impute.tnorm <- function (y, ry, x, tc_matrix=tcm, varname=get("vname", env
         }
     }
     
-    save(parm, file=sprintf("output/coefs/%d/%s_%d_%d.Rdata", A_YEAR, varname, imp_n, iter))
+    save(
+        parm, 
+        file = file.path(
+            coefs_yr_dir,
+            sprintf("%s_%d_%d.Rdata", varname, imp_n, iter)
+        )
+    )
 
     
     if(iter==10) {
@@ -357,12 +386,20 @@ mice.impute.tnorm <- function (y, ry, x, tc_matrix=tcm, varname=get("vname", env
         start_time <- Sys.time()
         lm_obj <- lm(data.table(y[ry & obs_non_zero], x[ry & obs_non_zero, -1]))
         cat("\nLinear regression r-squared =", summary(lm_obj)$r.squared, ".")
-        png(filename = paste0("output/imp_diagnostics/from_tnorm/", 
-                              paste(varname, A_YEAR, iter, imp_n, "qqplot.png", sep="_")))
+        png(
+            filename = file.path(
+                tnorm_dir,
+                paste(varname, A_YEAR, iter, imp_n, "qqplot.png", sep="_")
+            )
+        )
         try(modified_qqPlot(lm_obj, main=varname))
         dev.off()
-        png(filename = paste0("output/imp_diagnostics/from_tnorm/", 
-                              paste(varname, A_YEAR, iter, imp_n, "resid_plot.png", sep="_")))
+        png(
+            filename = file.path(
+                tnorm_dir, 
+                paste(varname, A_YEAR, iter, imp_n, "resid_plot.png", sep="_")
+            )
+        )
         try(modified_spreadLevelPlot(lm_obj, main=varname))
         dev.off()
         plot_time <- Sys.time() - start_time
@@ -399,7 +436,13 @@ mice.impute.rev_pmm <- function(y, ry, x, donors = 5, type = 1, ridge = 1e-05, v
     }
     iter <- get("iteration", pos=parent.frame())
     imp_n <- get("i", pos=parent.frame())
-    save(parm, file=sprintf("output/coefs/%d/%s_%d_%d.Rdata", A_YEAR, varname, imp_n, iter))
+    save(
+        parm, 
+        file = file.path(
+            coefs_yr_dir,
+            sprintf("%s_%d_%d.Rdata", varname, imp_n, iter)
+        )
+    )
     yhatobs <- x[ry, ] %*% parm$coef
     yhatmis <- x[!ry, ] %*% parm$beta
     if (version == "2.21") 
@@ -432,7 +475,13 @@ mice.impute.rev_polyreg <- function (y, ry, x, nnet.maxit = 100, nnet.trace = FA
                     maxNWts = nnet.maxNWts, ...)
     iter <- get("iteration", pos=parent.frame())
     imp_n <- get("i", pos=parent.frame())
-    save(fit, file=sprintf("output/coefs/%d/%s_%d_%d.Rdata", A_YEAR, varname, imp_n, iter))
+    save(
+        fit, 
+        file = file.path(
+            coefs_yr_dir,
+            sprintf("%s_%d_%d.Rdata", varname, imp_n, iter)
+        )
+    )
     post <- predict(fit, xy[!ry, ], type = "probs")
     if (sum(!ry) == 1) 
         post <- matrix(post, nrow = 1, ncol = length(post))
@@ -541,10 +590,21 @@ imp_formulas <- apply(pred_matrix_list[[NAI]], 1, function(x) {
 
 ITER_DIR = "main/3_multiply_impute/1_imp_iterations/"
 
+if (!dir.exists(ITER_DIR)) dir.create(ITER_DIR)
+
 saved_iterations <- list.files(path=ITER_DIR, pattern=dss("imp_%s_\\d\\.Rdata", c(A_YEAR)))
 if(length(saved_iterations)==0) {
     print("Didn't find any saved iterations, starting from scratch.")
-    imp <- mice(d, m=10, maxit=1, method=imp_methods, predictorMatrix=pred_matrix_list[[NAI]], visitSequence="monotone", form=imp_formulas, MaxNWts=2500)
+    imp <- mice(
+        d, 
+        m = 10, 
+        maxit = 1, 
+        method = imp_methods, 
+        predictorMatrix = pred_matrix_list[[NAI]], 
+        visitSequence = "monotone", 
+        form = imp_formulas, 
+        MaxNWts=2500
+    )
     rm(d, imp_formulas, pred_matrix_list)
     save(imp, file=dss("%s/imp_%s_1.Rdata", c(ITER_DIR, A_YEAR)))
     for(i in 2:10) {
