@@ -45,7 +45,6 @@ for(yr in seq(1970, 2010, 10)) {
                      "tax_on_inc", "exemp_surtax", "gen_tax_cred", "child_tax_cred", 
                      "addl_child_tax_cred", "child_care_cred", "eitc", "inc_for_amt", 
                      "amt_liability_after_cred", "fed_inc_tax_before_cred", "fica_alt"))
-        # save(t, file=file.path(taxsim_output_dir, sprintf("taxsim_%d_%d.Rdata", yr, i)))
         t[ , year := tax_year + 1]
         t <- t[ , .(year, id, fed_inc_tax_liability, fica)]
         setkey(t, year, id)
