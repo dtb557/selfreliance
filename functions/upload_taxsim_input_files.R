@@ -1,14 +1,11 @@
 upload_taxsim_input_files <- function(input_dir) {
-    taxsim_input_files <- list.files(input_dir, full.names=TRUE)
-    uploader_file <- "tmp_upload.txt"
-    mput_cmd <- paste0("mput ", paste0(taxsim_input_files, collapse=" "))
-    cmds <- c("open taxsimftp.nber.org", 
-              "taxsim", 
-              "02138", 
-              "cd tmp", 
-              "prompt", 
-              mput_cmd)
-    cat(paste0(cmds, collapse="\n"), file=uploader_file)
-    system(paste0("ftp -s:", uploader_file))
-    file.remove(uploader_file)
+    taxsim_input_files <- list.files(input_dir, full.names = FALSE)
+    p <- dplyr::progress_estimated(length(taxsim_input_files))
+    for (f in taxsim_input_files) {
+        RCurl::ftpUpload(
+            file.path(input_dir, f),
+            paste0("ftp://taxsim:02138@taxsimftp.nber.org/tmp/", f)
+        )
+        p$tick()$print()
+    }
 }

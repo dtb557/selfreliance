@@ -1,15 +1,30 @@
 download_taxsim_output_files <- function(input_dir, output_dir) {
     taxsim_input_files <- list.files(input_dir, full.names=FALSE)
-    downloader_file <- "tmp_download.txt"
-    output_files <- paste0(taxsim_input_files, ".taxsim")
-    get_cmds <- paste0("get ", output_files, " ", file.path(output_dir, output_files))
-    cmds <- c("open taxsimftp.nber.org", 
-              "taxsim", 
-              "02138", 
-              "cd tmp", 
-              "prompt", 
-              get_cmds)
-    cat(paste0(cmds, collapse="\n"), file=downloader_file)
-    system(paste0("ftp -s:", downloader_file))
-    file.remove(downloader_file)
+    taxsim_output_files <- file.path(
+        output_dir, 
+        paste0(taxsim_input_files, ".taxsim")
+    )
+    # Don't download output files that already exist
+    taxsim_input_files <- taxsim_input_files[!file.exists(taxsim_output_files)]
+    p <- dplyr::progress_estimated(length(taxsim_input_files))
+    for (f in taxsim_input_files) {
+        out <- RCurl::getURLContent(
+            url = paste0("ftp://taxsimftp.nber.org/tmp/", f, ".taxsim"),
+            userpwd = "taxsim:02138",
+            ftp.use.epsv = FALSE,
+            dirlistonly = FALSE
+        )
+        write_taxsim(out, file.path(output_dir, paste0(f, ".taxsim")))
+        p$tick()$print()
+    }
+}
+
+write_taxsim <- function(data, path) {
+    fout <- file(path, open = "wt")
+    on.exit(close(fout))
+    if (is.raw(data)) {
+        write(rawToChar(data), file = fout)
+    } else {
+        write(data, file = fout)
+    }
 }
