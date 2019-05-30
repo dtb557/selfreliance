@@ -3,7 +3,7 @@
 
 source("functions/check_taxsim_input_output.R")
 
-input_dir <- "main/4b_estimate_taxes_and_transfers_imputed/1_taxsim_input"
-output_dir <- "main/4b_estimate_taxes_and_transfers_imputed/4_taxsim_output"
+input_dir <- "main/4b_estimate_taxes_and_transfers_non_imputed/1_taxsim_input"
+output_dir <- "main/4b_estimate_taxes_and_transfers_non_imputed/4_taxsim_output"
 
 check_taxsim_input_output(input_dir, output_dir)

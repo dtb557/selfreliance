@@ -5,7 +5,7 @@
 
 library(data.table)
 
-taxsim_output_dir <- "main/4b_estimate_taxes_and_transfers_imputed/4_taxsim_output"
+taxsim_output_dir <- "main/4b_estimate_taxes_and_transfers_non_imputed/4_taxsim_output"
 
 # Load cleaned data
 load("main/1_clean_data/cleaned_data_step_5_no_imputation.Rdata")
@@ -33,5 +33,5 @@ setkey(t, year, id)
 
 # Merge TAXSIM estimates into cleaned data and save
 d <- t[d]
-save(d, file=file.path("main/4b_estimate_taxes_and_transfers_imputed", 
+save(d, file=file.path("main/4b_estimate_taxes_and_transfers_non_imputed", 
                        "6_non_imp_data_post_tax.Rdata"))

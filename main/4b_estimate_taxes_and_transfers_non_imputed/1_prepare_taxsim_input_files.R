@@ -3,6 +3,10 @@
 ##############################
 library(data.table)
 
+taxsim_input_dir <- "main/4b_estimate_taxes_and_transfers_non_imputed/1_taxsim_input"
+
+if (!dir.exists(taxsim_input_dir)) dir.create(taxsim_input_dir)
+
 dss <- function(text, subs) {
     split = strsplit(text, "%s")[[1]]
     if(grepl("%s$", text)) split <- c(split, "")
@@ -42,4 +46,9 @@ d[ , inctot := as.integer(sum(incwage, incbus, incfarm, incss, incwelfr, incgov,
       by=.(year, serial, pernum)]
 out <- make_taxsim_dataset(copy(d))
 out <- rbind(c(9, 85, 2, rep(0, 19)), as.matrix(out))
-write.table(out, file="main/4b_estimate_taxes_and_transfers_imputed_non_imputed/1_taxsim_input/sr1970_2010", row.names=FALSE, col.names=FALSE)
+write.table(
+    out, 
+    file="main/4b_estimate_taxes_and_transfers_non_imputed/1_taxsim_input/sr1970_2010", 
+    row.names=FALSE, 
+    col.names=FALSE
+)
