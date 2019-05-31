@@ -22,6 +22,12 @@ library(data.table)
 library(Hmisc)
 library(weights)
 
+fam_adj <- TRUE
+exclude_alloc <- FALSE
+exclude_top_2_pct <- FALSE
+exclude_top_decile_female_earners <- FALSE
+exclude_top_decile_male_earners <- FALSE
+
 source("functions/make_decomp_component_table.R")
 source("functions/build_filename_suffix.R")
 
@@ -29,9 +35,10 @@ out <- vector(mode="list", length=10)
 
 OUT_DIR <- "main/8b_perform_decomposition_non_imputed/1_decomp_component_tables"
 
-
+if (!dir.exists(OUT_DIR)) dir.create(OUT_DIR)
 
 save_non_imp_decomp_component_tables <- function(
+    OUT_DIR,
     fam_adj = TRUE, 
     exclude_alloc = FALSE, 
     exclude_top_2_pct = TRUE, 
@@ -67,6 +74,12 @@ save_non_imp_decomp_component_tables <- function(
         
 }
 
-save_non_imp_decomp_component_tables() # defaults to fam_adj and exclude_top_2_pct
-save_non_imp_decomp_component_tables(fam_adj = FALSE)
+save_non_imp_decomp_component_tables(
+    OUT_DIR,
+    fam_adj = fam_adj, 
+    exclude_alloc = exclude_alloc, 
+    exclude_top_2_pct = exclude_top_2_pct, 
+    exclude_top_decile_female_earners = exclude_top_decile_female_earners, 
+    exclude_top_decile_male_earners = exclude_top_decile_male_earners
+)
 
