@@ -3,6 +3,7 @@
 #############################################################################
 library(data.table)
 library(mice)
+library(ipumsr)
 
 source("functions/make_analysis_dataset.R")
 
@@ -24,8 +25,8 @@ d <- d[ , .(pce, pnloc, subfamid, momloc,
             poploc, wtsupp, relate, nchild), keyby=.(year, serial, pernum)]
 
 # Add region
-ddi <- ipumsr::read_ipums_ddi("original_data/add_region.xml")
-region <- ipumsr::read_ipums_micro(ddi, data_file = "original_data/add_region.dat.gz")
+ddi <- read_ipums_ddi("original_data/add_region.xml")
+region <- read_ipums_micro(ddi, data_file = "original_data/add_region.dat.gz")
 region <- data.table(region)
 setnames(region, names(region), c("year", "serial", "region", "pernum"))
 setkey(region, year, serial, pernum)

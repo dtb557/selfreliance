@@ -2,6 +2,7 @@
 # Create analysis variables and save datasets with only necessary variables #
 #############################################################################
 library(data.table)
+library(ipumsr)
 
 source("functions/make_analysis_dataset.R")
 
@@ -19,6 +20,17 @@ do_string <- function(x) {
 }
 
 load("main/4b_estimate_taxes_and_transfers_non_imputed/6_non_imp_data_post_tax.Rdata")
+
+# Add region
+ddi <- read_ipums_ddi("original_data/add_region.xml")
+region <- read_ipums_micro(ddi, data_file = "original_data/add_region.dat.gz")
+region <- data.table(region)
+setnames(region, names(region), c("year", "serial", "region", "pernum"))
+setkey(region, year, serial, pernum)
+
+setkey(d, year, serial, pernum)
+d <- region[d]
+rm(region)
 
 for(n in "filestat") {
     do_string(dss("d[ , %s := NULL]", n))
