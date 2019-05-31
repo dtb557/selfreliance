@@ -79,21 +79,6 @@ save_imp_decomp_component_tables <- function(
             write.csv(out[[i]], file=outfile, row.names=FALSE)
         }
         
-        all <- rbindlist(out)
-        
-        non_key_vars <- setdiff(names(all), c("sex", "decade", "fam_structure"))
-        
-        cat("Averaging across imputations...\n")
-        
-        avg <- all[ , lapply(.SD, mean, na.rm = TRUE), .SDcols = non_key_vars, 
-             by = .(sex, decade, fam_structure)]
-        
-        outfile <- file.path(OUT_DIR, 
-                             sprintf("decomp_components_imputed_%s_avg.csv", suffix)
-        )
-        
-        write.csv(avg, file = outfile, row.names = FALSE)
-        
 }
 
 save_imp_decomp_component_tables() # defaults to fam_adj and exclude_top_2_pct

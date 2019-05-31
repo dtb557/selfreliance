@@ -22,6 +22,12 @@ library(data.table)
 library(Hmisc)
 library(weights)
 
+fam_adj <- TRUE
+exclude_alloc <- FALSE
+exclude_top_2_pct <- FALSE
+exclude_top_decile_female_earners <- FALSE
+exclude_top_decile_male_earners <- FALSE
+
 source("functions/make_decomp_component_table.R")
 source("functions/build_filename_suffix.R")
 
@@ -30,7 +36,10 @@ out <- vector(mode="list", length=10)
 IN_DIR <- "main/6a_make_analysis_dataset_imputed"
 OUT_DIR <- "main/8a_perform_decomposition_imputed/1_decomp_component_tables"
 
+if (!dir.exists(OUT_DIR)) dir.create(OUT_DIR)
+
 save_imp_decomp_component_tables <- function(
+    IN_DIR, OUT_DIR,
     fam_adj = TRUE, 
     exclude_alloc = FALSE, 
     exclude_top_2_pct = TRUE, 
@@ -79,23 +88,13 @@ save_imp_decomp_component_tables <- function(
             write.csv(out[[i]], file=outfile, row.names=FALSE)
         }
         
-        all <- rbindlist(out)
-        
-        non_key_vars <- setdiff(names(all), c("sex", "decade", "fam_structure"))
-        
-        cat("Averaging across imputations...\n")
-        
-        avg <- all[ , (non_key_vars) := lapply(.SD, mean, na.rm = TRUE), .SDcols = non_key_vars, 
-             by = .(sex, decade, fam_structure)]
-        
-        outfile <- file.path(OUT_DIR, 
-                             sprintf("decomp_components_imputed_%s_avg.csv", suffix)
-        )
-        
-        write.csv(avg, file = outfile, row.names = FALSE)
-        
 }
 
-save_imp_decomp_component_tables() # defaults to fam_adj and exclude_top_2_pct
-save_imp_decomp_component_tables(exclude_top_2_pct = FALSE)
-
+save_imp_decomp_component_tables(
+    IN_DIR, OUT_DIR,
+    fam_adj = fam_adj, 
+    exclude_alloc = exclude_alloc, 
+    exclude_top_2_pct = exclude_top_2_pct, 
+    exclude_top_decile_female_earners = exclude_top_decile_female_earners, 
+    exclude_top_decile_male_earners = exclude_top_decile_male_earners
+)
