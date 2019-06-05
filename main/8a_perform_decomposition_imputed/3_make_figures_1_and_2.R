@@ -1,5 +1,21 @@
 source("functions/make_figures_1_and_2_imputed.R")
 
-make_figures_1_and_2_imputed() # defaults to fam_adj and exclude_top_2_pct
-make_figures_1_and_2_imputed(exclude_top_2_pct = FALSE)
-make_figures_1_and_2_imputed(fam_adj = FALSE)
+IN_DIR <- "main/8a_perform_decomposition_imputed/2_qois_for_tables_and_figs"
+OUT_DIR <- "main/8a_perform_decomposition_imputed/3_figures_1_and_2"
+
+if (!dir.exists(OUT_DIR)) dir.create(OUT_DIR)
+
+fam_adj <- TRUE
+exclude_alloc <- FALSE
+exclude_top_2_pct <- FALSE
+exclude_top_decile_female_earners <- FALSE
+exclude_top_decile_male_earners <- FALSE
+
+make_figures_1_and_2_imputed(
+    IN_DIR, OUT_DIR,
+    fam_adj = fam_adj, 
+    exclude_alloc = exclude_alloc, 
+    exclude_top_2_pct = exclude_top_2_pct, 
+    exclude_top_decile_female_earners = exclude_top_decile_female_earners, 
+    exclude_top_decile_male_earners = exclude_top_decile_male_earners
+)
