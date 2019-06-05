@@ -5,14 +5,22 @@ library(weights)
 source("functions/build_filename_suffix.R")
 source("functions/make_qois_for_tables_and_figs.R")
 
+fam_adj <- TRUE
+exclude_alloc <- FALSE
+exclude_top_2_pct <- FALSE
+exclude_top_decile_female_earners <- FALSE
+exclude_top_decile_male_earners <- FALSE
+
 IN_DIR <- "main/6c_make_analysis_dataset_no_cohab/"
 OUT_DIR <- "main/8c_perform_decomposition_no_cohab/2_qois_for_tables_and_figs"
 
-save_qois_for_tables_and_figs <- function(fam_adj = TRUE, 
-                                          exclude_alloc = FALSE, 
-                                          exclude_top_2_pct = TRUE, 
-                                          exclude_top_decile_female_earners = FALSE, 
-                                          exclude_top_decile_male_earners = FALSE) {
+if (!dir.exists(OUT_DIR)) dir.create(OUT_DIR)
+
+save_qois_for_tables_and_figs <- function(fam_adj, 
+                                          exclude_alloc, 
+                                          exclude_top_2_pct, 
+                                          exclude_top_decile_female_earners, 
+                                          exclude_top_decile_male_earners) {
     suffix <- build_filename_suffix(
         fam_adj, 
         exclude_alloc, 
@@ -42,6 +50,11 @@ save_qois_for_tables_and_figs <- function(fam_adj = TRUE,
     }
 }
 
-save_qois_for_tables_and_figs() # defaults to fam_adj and exclude_top_2_pct
-save_qois_for_tables_and_figs(exclude_top_2_pct = FALSE)
-save_qois_for_tables_and_figs(fam_adj = FALSE)
+save_qois_for_tables_and_figs(
+    IN_DIR, OUT_DIR,
+    fam_adj = fam_adj, 
+    exclude_alloc = exclude_alloc, 
+    exclude_top_2_pct = exclude_top_2_pct, 
+    exclude_top_decile_female_earners = exclude_top_decile_female_earners, 
+    exclude_top_decile_male_earners = exclude_top_decile_male_earners
+)

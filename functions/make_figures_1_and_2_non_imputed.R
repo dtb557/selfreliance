@@ -1,15 +1,13 @@
-make_figures_1_and_2_non_imputed <- function(fam_adj = TRUE, 
-                                 exclude_alloc = FALSE, 
-                                 exclude_top_2_pct = TRUE, 
-                                 exclude_top_decile_female_earners = FALSE, 
-                                 exclude_top_decile_male_earners = FALSE) {
+make_figures_1_and_2_non_imputed <- function(IN_DIR, OUT_DIR,
+                                             fam_adj, 
+                                             exclude_alloc, 
+                                             exclude_top_2_pct, 
+                                             exclude_top_decile_female_earners, 
+                                             exclude_top_decile_male_earners) {
     
     require(data.table)
     
     source("functions/build_filename_suffix.R")
-    
-    qoi_dir <- "main/8b_perform_decomposition_non_imputed/2_qois_for_tables_and_figs"
-    out_dir <- "main/8b_perform_decomposition_non_imputed/3_figures_1_and_2"
     
     suffix <- build_filename_suffix(fam_adj, 
                                     exclude_alloc, 
@@ -25,7 +23,7 @@ make_figures_1_and_2_non_imputed <- function(fam_adj = TRUE,
                             yr, 
                             suffix)
         
-        load(file.path(qoi_dir, qoi_file))
+        load(file.path(IN_DIR, qoi_file))
         qoi
     })
 
@@ -41,7 +39,7 @@ make_figures_1_and_2_non_imputed <- function(fam_adj = TRUE,
     years <- years
     self_reliance_by_decade[ , year := rep(years, each=2)]
     
-    out_file <- file.path(out_dir, 
+    out_file <- file.path(OUT_DIR, 
                        sprintf("figure_1_panels_1_and_2_%s.csv", suffix)
     )
     write.csv(self_reliance_by_decade, file=out_file, row.names=FALSE)
@@ -55,7 +53,7 @@ make_figures_1_and_2_non_imputed <- function(fam_adj = TRUE,
                                      men_faminc_pctile=qoi[[1]]$mens_faminc_pctile_by_decile, 
                                      women_faminc_pctile=qoi[[1]]$womens_faminc_pctile_by_decile)
     
-    out_file <- file.path(out_dir, 
+    out_file <- file.path(OUT_DIR, 
                        sprintf("figure_1_panels_3_and_4_%s.csv", suffix)
     )
     write.csv(faminc_pctile_data, file=out_file, row.names=FALSE)
@@ -86,7 +84,7 @@ make_figures_1_and_2_non_imputed <- function(fam_adj = TRUE,
     
     out <- female_male_sr_ratio[wives_share[fm_earn_ratio]]
     
-    out_file <- file.path(out_dir, 
+    out_file <- file.path(OUT_DIR, 
                           sprintf("figure_2_%s.csv", suffix)
     )
     write.csv(out, file = out_file, row.names=FALSE)
