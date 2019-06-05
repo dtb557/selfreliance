@@ -34,7 +34,7 @@ make_figures_1_and_2_non_imputed <- function(IN_DIR, OUT_DIR,
     self_reliance_by_decade[ , year := rep(years, each=2)]
     
     out_file <- file.path(OUT_DIR, 
-                       sprintf("figure_1_panels_1_and_2_%s.csv", suffix)
+                       sprintf("figure_3_%s.csv", suffix)
     )
     write.csv(self_reliance_by_decade, file=out_file, row.names=FALSE)
     
@@ -48,7 +48,7 @@ make_figures_1_and_2_non_imputed <- function(IN_DIR, OUT_DIR,
                                      women_faminc_pctile=qoi[[1]]$womens_faminc_pctile_by_decile)
     
     out_file <- file.path(OUT_DIR, 
-                       sprintf("figure_1_panels_3_and_4_%s.csv", suffix)
+                       sprintf("figure_1_%s.csv", suffix)
     )
     write.csv(faminc_pctile_data, file=out_file, row.names=FALSE)
     
