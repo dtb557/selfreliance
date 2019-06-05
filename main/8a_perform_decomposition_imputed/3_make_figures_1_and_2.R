@@ -1,7 +1,7 @@
-source("functions/make_figures_1_and_2_imputed.R")
+source("functions/make_figures_1_2_and_3_imputed.R")
 
 IN_DIR <- "main/8a_perform_decomposition_imputed/2_qois_for_tables_and_figs"
-OUT_DIR <- "main/8a_perform_decomposition_imputed/3_figures_1_and_2"
+OUT_DIR <- "main/8a_perform_decomposition_imputed/3_figures_1_2_and_3"
 
 if (!dir.exists(OUT_DIR)) dir.create(OUT_DIR)
 
@@ -11,7 +11,7 @@ exclude_top_2_pct <- FALSE
 exclude_top_decile_female_earners <- FALSE
 exclude_top_decile_male_earners <- FALSE
 
-make_figures_1_and_2_imputed(
+make_figures_1_2_and_3_imputed(
     IN_DIR, OUT_DIR,
     fam_adj = fam_adj, 
     exclude_alloc = exclude_alloc, 

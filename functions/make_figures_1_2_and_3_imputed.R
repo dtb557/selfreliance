@@ -1,4 +1,4 @@
-make_figures_1_and_2_imputed <- function(IN_DIR, OUT_DIR, 
+make_figures_1_2_and_3_imputed <- function(IN_DIR, OUT_DIR, 
                                          fam_adj, 
                                          exclude_alloc, 
                                          exclude_top_2_pct, 
