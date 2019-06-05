@@ -27,13 +27,7 @@ make_figures_1_and_2_non_imputed <- function(IN_DIR, OUT_DIR,
         qoi
     })
 
-    # Figure 1: Four-panel figure; 
-        # top-left graph (Panel A) self-reliance by decade, men; 
-        # top-right graph (Panel B) self-reliance by decade, women; 
-        # bottom-left graph (Panel C) rank in gender-specific family income dist. by rank in gender-specific earnings dist, men 1970; 
-        # bottom-right graph (Panel D) rank in gender-specific family income dist. by rank in gender-specific earnings dist, women 1970
-    
-    # Figure 1, Panels 1 and 2
+    # Figure 3: self-reliance by decade for men and women
 
     self_reliance_by_decade <- rbindlist(lapply(qoi, `[[`, "self_reliance"))
     years <- years
@@ -45,7 +39,7 @@ make_figures_1_and_2_non_imputed <- function(IN_DIR, OUT_DIR,
     write.csv(self_reliance_by_decade, file=out_file, row.names=FALSE)
     
     
-    # Figure 1, Panels 3 and 4
+    # Figure 1: family income percentile by earnings decile
     
     decile_labels <- c("No earn", as.character(1:10))
     
