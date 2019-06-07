@@ -450,8 +450,8 @@ fun.tab01 <- function(out.decomp,dat.decomp) {
     return(tab01)
 }       
 #     
-# Function to to create table 2 from each imputed data set
-fun.tab02 <- function(dat.decomp) {
+# Function to to create (old) table 2 from each imputed data set
+fun.old.tab02 <- function(dat.decomp) {
     # (assumption of equal share of men/women)
     pi_s <- .5
     # (1970 pooled men+women stats)
@@ -498,9 +498,9 @@ fun.tab02 <- function(dat.decomp) {
     return(tab02)
 }
 #  
-# Function to to create table 3 from each imputed data set
-fun.tab03 <- function(out.decomp) {
-    tab03 <- rbind(cbind(c(out.decomp$f.7010.5$r.change.obs[1],
+# Function to to create table 2 from each imputed data set
+fun.tab02 <- function(out.decomp) {
+    tab02 <- rbind(cbind(c(out.decomp$f.7010.5$r.change.obs[1],
                            out.decomp$f.7010.5$r.change.pi,
                            out.decomp$f.7010.5$r.change.ev,
                            100*out.decomp$f.7010.5$r.change.pi/out.decomp$f.7010.5$r.change.obs[1],
@@ -520,37 +520,37 @@ fun.tab03 <- function(out.decomp) {
                            out.decomp$m.7010.5.part$r.change.ev, 
                            100*out.decomp$m.7010.5.part$r.change.pi/out.decomp$m.7010.5.part$r.change.obs[1],
                            100*out.decomp$m.7010.5.part$r.change.ev/out.decomp$m.7010.5.part$r.change.obs[1])))
-    rownames(tab03) <- c("Raw Change, 1970-2010","Due to Composition","Due to Association",
+    rownames(tab02) <- c("Raw Change, 1970-2010","Due to Composition","Due to Association",
                          "% Due to Composition","% Due to Association",
                          "P.Raw Change, 1970-2010","P.Due to Composition","P.Due to Association",
                          "P.% Due to Composition","P.% Due to Association")
-    colnames(tab03) <- c("Women","Men")   
-    return(tab03)
+    colnames(tab02) <- c("Women","Men")   
+    return(tab02)
 }                                            
 # 
-# Function to create table 4 from each imputed data set
+# Function to create table 3 from each imputed data set
 # (note that the "association" not standardized is the association that when weighted and summed over groups gives us 
 #  the total self-reliance in that gender/year; it is not equal to the "r_g" column in the spreadsheet)
-fun.tab04 <- function(dat.decomp) {
-    tab04 <- cbind(dat.decomp$f.70[,"pi_g"],dat.decomp$f.10[,"pi_g"],
+fun.tab03 <- function(dat.decomp) {
+    tab03 <- cbind(dat.decomp$f.70[,"pi_g"],dat.decomp$f.10[,"pi_g"],
                    fun.r.g(dat.decomp$f.70),fun.r.g(dat.decomp$f.10), 
                    fun.r.grand.stand(dat.decomp$f.70),fun.r.grand.stand(dat.decomp$f.10), 
                    dat.decomp$m.70[,"pi_g"],dat.decomp$m.10[,"pi_g"],
                    fun.r.g(dat.decomp$m.70),fun.r.g(dat.decomp$m.10), 
                    fun.r.grand.stand(dat.decomp$m.70),fun.r.grand.stand(dat.decomp$m.10))
     # (re-ordering rows so that partnered, dual-earner is on top) 
-    tab04 <- tab04[c(2,1,3:5),]
-    rownames(tab04) <- c("Partnered, Both earning","Partnered, One earning","Partnered, Neither earning",
+    tab03 <- tab03[c(2,1,3:5),]
+    rownames(tab03) <- c("Partnered, Both earning","Partnered, One earning","Partnered, Neither earning",
                          "Single, Earning","Single, Not earning")
-    colnames(tab04) <- c("W Share 1970","W Share 2010","W Association 1970","W Association 2010","W Std. Assoc. 1970","W Std. Assoc. 2010",
+    colnames(tab03) <- c("W Share 1970","W Share 2010","W Association 1970","W Association 2010","W Std. Assoc. 1970","W Std. Assoc. 2010",
                          "M Share 1970","M Share 2010","M Association 1970","M Association 2010","M Std. Assoc. 1970","M Std. Assoc. 2010") 
-    return(as.matrix(tab04))                                          
+    return(as.matrix(tab03))                                          
 } 
 #
-# Function to create table 5 from each imputed data set
-fun.tab05 <- function(out.decomp) {
+# Function to create table 4 from each imputed data set
+fun.tab04 <- function(out.decomp) {
     # (full population)
-    tab05 <- cbind(c(out.decomp$f.7010.5$r.change.obs[1],
+    tab04 <- cbind(c(out.decomp$f.7010.5$r.change.obs[1],
                      out.decomp$f.7010.5$r.change.ev,out.decomp$f.7010.5$r.change.pi,
                      100*out.decomp$f.7010.5$r.change.ev/out.decomp$f.7010.5$r.change.obs[1],
                      100*out.decomp$f.7010.5$r.change.pi/out.decomp$f.7010.5$r.change.obs[1],
@@ -590,9 +590,9 @@ fun.tab05 <- function(out.decomp) {
                      out.decomp$m.7010.5$r.change.sp.bt.share*out.decomp$m.7010.5$r.change.sp/100,
                      out.decomp$m.7010.5$r.change.ot.bt.share*out.decomp$m.7010.5$r.change.ot/100,
                      out.decomp$m.7010.5$r.change.xx.bt.share*out.decomp$m.7010.5$r.change.xx/100,rep(999,7))   )
-    colnames(tab05) <- c("W 1970-2010","W Within","W Between",
+    colnames(tab04) <- c("W 1970-2010","W Within","W Between",
                          "M 1970-2010","M Within","M Between")
-    rownames(tab05) <- c("Change","Due to Association","Due to Composition",
+    rownames(tab04) <- c("Change","Due to Association","Due to Composition",
                          "% due to Association","% due to Composition",
                          "Due to Spousal Assoc.","Due to Redistribution",
                          "Due to Earnings Distributions","Due to Family Structure",
@@ -601,7 +601,7 @@ fun.tab05 <- function(out.decomp) {
                          "% due to Earnings Distributions","% due to Family Structure",
                          "% due to Labor force Participation")
     # (partnered-only version)
-    tab05p <- cbind(c(out.decomp$f.7010.5.part$r.change.obs[1],
+    tab04p <- cbind(c(out.decomp$f.7010.5.part$r.change.obs[1],
                       out.decomp$f.7010.5.part$r.change.ev,out.decomp$f.7010.5.part$r.change.pi,
                       100*out.decomp$f.7010.5.part$r.change.ev/out.decomp$f.7010.5.part$r.change.obs[1],
                       100*out.decomp$f.7010.5.part$r.change.pi/out.decomp$f.7010.5.part$r.change.obs[1],
@@ -637,9 +637,9 @@ fun.tab05 <- function(out.decomp) {
                       out.decomp$m.7010.5.part$r.change.sp.bt.share*out.decomp$m.7010.5.part$r.change.sp/100,
                       out.decomp$m.7010.5.part$r.change.ot.bt.share*out.decomp$m.7010.5.part$r.change.ot/100,
                       out.decomp$m.7010.5.part$r.change.xx.bt.share*out.decomp$m.7010.5.part$r.change.xx/100,rep(999,5))   )
-    colnames(tab05p) <- c("W 1970-2010","W Within","W Between",
+    colnames(tab04p) <- c("W 1970-2010","W Within","W Between",
                           "M 1970-2010","M Within","M Between")
-    rownames(tab05p) <- c("Change","Due to Association","Due to Composition",
+    rownames(tab04p) <- c("Change","Due to Association","Due to Composition",
                           "% due to Association","% due to Composition",
                           "Due to Spousal Assoc.","Due to Redistribution",
                           "Due to Earnings Distributions",
@@ -647,7 +647,7 @@ fun.tab05 <- function(out.decomp) {
                           "% due to Spousal Assoc.","% due to Redistribution",
                           "% due to Earnings Distributions",
                           "% due to Labor-force Participation")
-    return(list(tab05=tab05,tab05p=tab05p))       
+    return(list(tab04=tab04,tab04p=tab04p))       
 }
 #
 # Function to create appendix table A1 from each imputed data set
@@ -802,67 +802,67 @@ fun.tabs.list <- function(out.decomp.1,out.decomp.2,out.decomp.3,out.decomp.4,ou
                        fun.tab01(out.decomp.9,dat.decomp.9),
                        fun.tab01(out.decomp.10,dat.decomp.10))
     tab01 <- Reduce("+",tab01.list)/length(tab01.list) 
-    # (apply table 2 function) 
-    tab02.list <- list(fun.tab02(dat.decomp.1),
-                       fun.tab02(dat.decomp.2),
-                       fun.tab02(dat.decomp.3),
-                       fun.tab02(dat.decomp.4),
-                       fun.tab02(dat.decomp.5),
-                       fun.tab02(dat.decomp.6),
-                       fun.tab02(dat.decomp.7),
-                       fun.tab02(dat.decomp.8),
-                       fun.tab02(dat.decomp.9),
-                       fun.tab02(dat.decomp.10))
+    # (apply old table 2 function) 
+    old.tab02.list <- list(fun.old.tab02(dat.decomp.1),
+                       fun.old.tab02(dat.decomp.2),
+                       fun.old.tab02(dat.decomp.3),
+                       fun.old.tab02(dat.decomp.4),
+                       fun.old.tab02(dat.decomp.5),
+                       fun.old.tab02(dat.decomp.6),
+                       fun.old.tab02(dat.decomp.7),
+                       fun.old.tab02(dat.decomp.8),
+                       fun.old.tab02(dat.decomp.9),
+                       fun.old.tab02(dat.decomp.10))
+    old.tab02 <- Reduce("+",old.tab02.list)/length(old.tab02.list)
+    # (apply table 2 function)
+    tab02.list <- list(fun.tab02(out.decomp.1),
+                       fun.tab02(out.decomp.2),
+                       fun.tab02(out.decomp.3),
+                       fun.tab02(out.decomp.4),
+                       fun.tab02(out.decomp.5),
+                       fun.tab02(out.decomp.6),
+                       fun.tab02(out.decomp.7),
+                       fun.tab02(out.decomp.8),
+                       fun.tab02(out.decomp.9),
+                       fun.tab02(out.decomp.10))
     tab02 <- Reduce("+",tab02.list)/length(tab02.list)
-    # (apply table 3 function)
-    tab03.list <- list(fun.tab03(out.decomp.1),
-                       fun.tab03(out.decomp.2),
-                       fun.tab03(out.decomp.3),
-                       fun.tab03(out.decomp.4),
-                       fun.tab03(out.decomp.5),
-                       fun.tab03(out.decomp.6),
-                       fun.tab03(out.decomp.7),
-                       fun.tab03(out.decomp.8),
-                       fun.tab03(out.decomp.9),
-                       fun.tab03(out.decomp.10))
+    # (apply table 3 function) 
+    tab03.list <- list(fun.tab03(dat.decomp.1),
+                       fun.tab03(dat.decomp.2),
+                       fun.tab03(dat.decomp.3),
+                       fun.tab03(dat.decomp.4),
+                       fun.tab03(dat.decomp.5),
+                       fun.tab03(dat.decomp.6),
+                       fun.tab03(dat.decomp.7),
+                       fun.tab03(dat.decomp.8),
+                       fun.tab03(dat.decomp.9),
+                       fun.tab03(dat.decomp.10))
     tab03 <- Reduce("+",tab03.list)/length(tab03.list)
     # (apply table 4 function) 
-    tab04.list <- list(fun.tab04(dat.decomp.1),
-                       fun.tab04(dat.decomp.2),
-                       fun.tab04(dat.decomp.3),
-                       fun.tab04(dat.decomp.4),
-                       fun.tab04(dat.decomp.5),
-                       fun.tab04(dat.decomp.6),
-                       fun.tab04(dat.decomp.7),
-                       fun.tab04(dat.decomp.8),
-                       fun.tab04(dat.decomp.9),
-                       fun.tab04(dat.decomp.10))
-    tab04 <- Reduce("+",tab04.list)/length(tab04.list)
-    # (apply table 5 function) 
     # (full population)
-    tab05.list <- list(fun.tab05(out.decomp.1)$tab05,
-                       fun.tab05(out.decomp.2)$tab05,
-                       fun.tab05(out.decomp.3)$tab05,
-                       fun.tab05(out.decomp.4)$tab05,
-                       fun.tab05(out.decomp.5)$tab05,
-                       fun.tab05(out.decomp.6)$tab05,
-                       fun.tab05(out.decomp.7)$tab05,
-                       fun.tab05(out.decomp.8)$tab05,
-                       fun.tab05(out.decomp.9)$tab05,
-                       fun.tab05(out.decomp.10)$tab05)
-    tab05 <- Reduce("+",tab05.list)/length(tab05.list)
+    tab04.list <- list(fun.tab04(out.decomp.1)$tab04,
+                       fun.tab04(out.decomp.2)$tab04,
+                       fun.tab04(out.decomp.3)$tab04,
+                       fun.tab04(out.decomp.4)$tab04,
+                       fun.tab04(out.decomp.5)$tab04,
+                       fun.tab04(out.decomp.6)$tab04,
+                       fun.tab04(out.decomp.7)$tab04,
+                       fun.tab04(out.decomp.8)$tab04,
+                       fun.tab04(out.decomp.9)$tab04,
+                       fun.tab04(out.decomp.10)$tab04)
+    tab04 <- Reduce("+",tab04.list)/length(tab04.list)
     #  (partnered population)
-    tab05p.list <- list(fun.tab05(out.decomp.1)$tab05p,
-                        fun.tab05(out.decomp.2)$tab05p,
-                        fun.tab05(out.decomp.3)$tab05p,
-                        fun.tab05(out.decomp.4)$tab05p,
-                        fun.tab05(out.decomp.5)$tab05p,
-                        fun.tab05(out.decomp.6)$tab05p,
-                        fun.tab05(out.decomp.7)$tab05p,
-                        fun.tab05(out.decomp.8)$tab05p,
-                        fun.tab05(out.decomp.9)$tab05p,
-                        fun.tab05(out.decomp.10)$tab05p)
-    tab05p <- Reduce("+",tab05p.list)/length(tab05p.list)
+    tab04p.list <- list(fun.tab04(out.decomp.1)$tab04p,
+                        fun.tab04(out.decomp.2)$tab04p,
+                        fun.tab04(out.decomp.3)$tab04p,
+                        fun.tab04(out.decomp.4)$tab04p,
+                        fun.tab04(out.decomp.5)$tab04p,
+                        fun.tab04(out.decomp.6)$tab04p,
+                        fun.tab04(out.decomp.7)$tab04p,
+                        fun.tab04(out.decomp.8)$tab04p,
+                        fun.tab04(out.decomp.9)$tab04p,
+                        fun.tab04(out.decomp.10)$tab04p)
+    tab04p <- Reduce("+",tab04p.list)/length(tab04p.list)
     # (apply table A1 function) 
     tab.a01.list <- list(fun.tab.a01(out.decomp.1),
                          fun.tab.a01(out.decomp.2),
@@ -876,8 +876,8 @@ fun.tabs.list <- function(out.decomp.1,out.decomp.2,out.decomp.3,out.decomp.4,ou
                          fun.tab.a01(out.decomp.10))
     tab.a01 <- Reduce("+",tab.a01.list)/length(tab.a01.list)
     # (output)
-    out <- list(tab01=tab01,tab02=tab02,tab03=tab03,tab04=tab04,
-                tab05=tab05,tab05p=tab05p,tab.a01=tab.a01)
+    out <- list(tab01=tab01,old.tab02=old.tab02,tab02=tab02,tab03=tab03,
+                tab04=tab04,tab04p=tab04p,tab.a01=tab.a01)
     return(out)            
 }
 
