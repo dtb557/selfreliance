@@ -13,6 +13,14 @@
 ###
 
 library(data.table)
+library(Hmisc)
+library(weights)
+
+fam_adj <- TRUE
+exclude_alloc <- FALSE
+exclude_top_2_pct <- FALSE
+exclude_top_decile_female_earners <- FALSE
+exclude_top_decile_male_earners <- FALSE
 
 
 ###
@@ -21,9 +29,9 @@ library(data.table)
 
 DATA_DIR <- "main/6a_make_analysis_dataset_imputed"
 DATA_FILE_PATTERN <- "1_imps_%d_analysis_vars.Rdata" # "%d" is placeholder for year
-OUT_DIR <- "main/9_estimate_uncertainty"
-INTERMEDIATE_OUT_FILE <- "all_bootstrap_decomp_tables.Rdata"
-OUT_FILE <- "tabs_list.RData"
+OUT_DIR <- "main/9_make_tables"
+INTERMEDIATE_OUT_FILE <- "1_all_bootstrap_decomp_tables.Rdata"
+OUT_FILE <- "1_tabs_list.Rdata"
 
 
 ###
@@ -975,11 +983,11 @@ if (file.exists(decomp_component_file)) {
                 )
                 tbl <- make_decomp_component_table(
                     imps[[imp_i]][bsamp, ], 
-                    fam_adj = TRUE, 
-                    exclude_alloc = FALSE, 
-                    exclude_top_2_pct = FALSE, 
-                    exclude_top_decile_female_earners = FALSE, 
-                    exclude_top_decile_male_earners = FALSE
+                    fam_adj = fam_adj, 
+                    exclude_alloc = exclude_alloc, 
+                    exclude_top_2_pct = exclude_top_2_pct, 
+                    exclude_top_decile_female_earners = exclude_top_decile_female_earners, 
+                    exclude_top_decile_male_earners = exclude_top_decile_male_earners
                 )
                 decomp_component_list[[imp_i]][[sample_i]] <- 
                     # Row-bind results across decades by imputation index (imp_i)
