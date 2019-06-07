@@ -1,0 +1,338 @@
+---
+output: github_document
+---
+
+# Economic Self-Reliance and Gender Inequality
+
+This is a replication repository for Deirdre Bloome, Derek Burk, and Leslie 
+McCall, "Economic Self-Reliance and Gender Inequality between U.S. Men and 
+Women, 1970–2010," American Journal of Sociology 124, no. 5 (March 2019): 1413-
+1467.
+
+## Overview of directory structure
+
+**main**: This directory contains all the scripts that can be used to reproduce 
+our main analysis.
+
+**functions**: This directory contains scripts which define functions used in 
+the analysis scripts in **main** and **auxiliary**.
+
+**original_data**: This directory contains all data files necessary to 
+reproduce our analyses. All data are derived from IPUMS CPS extracts, downloaded 
+from the [IPUMS CPS website](https://cps.ipums.org/cps/). These data are posted 
+here with the permission of IPUMS.
+
+Sarah Flood, Miriam King, Steven Ruggles, and J. Robert Warren. Integrated
+Public Use Microdata Series, Current Population Survey: Version 5.0 [dataset].
+Minneapolis, MN: University of Minnesota, 2017. https://doi.org/10.18128/
+D030.V5.0
+
+The file "cps_master.Rdata" was created by loading an IPUMS extract downloaded 
+as a .dta file into R using the **foreign** package, and saving it to an .Rdata 
+file without modification. All other data files were downloaded directly from 
+IPUMS CPS. The file "topcode_values.csv" is derived from the income component 
+topcode values provided [here](https://cps.ipums.org/cps/topcodes_tables.shtml).
+
+**auxiliary**: This directory contains scripts used for sensitivity analyses.
+
+## Required R packages
+
+The following packages were used in our analysis:
+
+* data.table
+* stringr
+* foreign
+* mice, version 2.25
+* nnet
+* car
+* MASS
+* pscl
+* RCurl
+* dplyr
+* magrittr
+* ipumsr
+* Hmisc
+* weights
+
+Unfortunately, we did not rigorously track the package versions used in the 
+analysis, with the exception of the mice package. However, we were able to 
+replicate our results with the following setup:
+
+```{r warning=FALSE}
+pkgs <- c("data.table", "stringr", "foreign", "mice", "nnet", "car", "MASS", 
+          "pscl", "RCurl", "dplyr", "magrittr", "ipumsr", "Hmisc", "weights")
+for (p in pkgs) {
+    suppressPackageStartupMessages(library(p, character.only = TRUE))
+}
+sessionInfo()
+```
+
+To install mice version 2.25, you can use the following code:
+
+```{r eval=FALSE}
+# install.packages("remotes")
+remotes::install_version("mice", version = "2.25")
+```
+
+
+
+## Replication guide
+
+All scripts necessary to reproduce our main analysis can be found in the 
+**main** directory. The subdirectories of **main** are numbered according to the
+order in which scripts should be run, and the files within each subdirectory 
+are similarly numbered. We list these scripts below, in order, and include 
+notes describing any parameters that need to be set and the outputs created by 
+each script. All scripts create output in the same directory as the script 
+itself, or in a subdirectory of that directory.
+
+### main/1_clean_data
+
+* **clean_data_step_1.R**: Creates output "cleaned_data_step_1.Rdata".
+* **clean_data_step_2.R**: Creates output "cleaned_data_step_2.Rdata".
+* **clean_data_step_2_no_imputation**: Creates output "cleaned_data_step_2_no_imputation.Rdata".
+* **clean_data_step_3.R**: This script requires the analyst to set the value of 
+  the `imputation` parameter at the top of the script to `TRUE` or `FALSE`. 
+  When `imputation == TRUE`, the script creates output "cleaned_data_step_3.Rdata". 
+  When `imputation == FALSE`, the script creates output "cleaned_data_step_3_no_imputation.Rdata".
+* **clean_data_step_4.R**: This script requires the analyst to set the value of 
+  the `imputation` parameter at the top of the script to `TRUE` or `FALSE`. 
+  When `imputation == TRUE`, the script creates output "cleaned_data_step_4.Rdata". 
+  When `imputation == FALSE`, the script creates output "cleaned_data_step_4_no_imputation.Rdata".
+* **clean_data_step_5.R**: This script requires the analyst to set the value of 
+  the `imputation` parameter at the top of the script to `TRUE` or `FALSE`. 
+  When `imputation == TRUE`, the script creates output "cleaned_data_step_5.Rdata". 
+  When `imputation == FALSE`, the script creates output "cleaned_data_step_5_no_imputation.Rdata".
+  
+### main/2_prepare_for_imputation
+
+In selecting variables to include in the imputation, we followed recommendations
+from:
+
+van Buuren, Stef Flexible Imputation of Missing Data. CRC Press, 2012.
+(particularly Chapter 5)
+
+van Buuren, S., and Karin Groothuis-Oudshoorn. "mice: Multivariate imputation by 
+chained equations in R." Journal of statistical software (2010): 1-68.
+
+* **1_examine_distributions_pre_imputation.R**: This script creates histograms
+  of all variables to assess the need to transform variables included in the 
+  multiple imputation. The histograms are saved as .png files in the 
+  "1_variable_distributions" subdirectory. We visually examined the histograms to 
+  decide which variables to transform, and recorded our decisions in the 
+  file "1_variable_distributions/variable_transformations.csv", which is called 
+  upon in the next script.
+* **2_get_corr.sh**: This script cannot be run as-is, but is included for 
+  documentary purposes. It was used to submit the script 
+  "2_get_corr_r2_cramers_v_by_decade_array.R" to a cluster job runner in order 
+  to run it separately on each decade of our data.
+* **2_get_corr_r2_cramers_v_by_decade_array.R**: This script was written to be 
+  run as part of a cluster job that would operate on each decade of data in 
+  parallel, but can be run locally by setting the `NAI` parameter at the top 
+  of the file to a value between 1 and 5, corresponding to the five decades 
+  between 1970 and 2010, or by supplying the value as a trailing argument 
+  if running the script from the command line. Also note that this script may 
+  print error messages, but as long as execution does not stop, these errors 
+  have been handled (with the `try` function) and can be safely ignored.
+* **3_create_pred_matrix_by_decade.R**: Creates output 
+  "3_pred_matrix_list.Rdata".
+  
+### main/3_multiply_impute
+
+* **1_full_imputation_by_year_array_with_ppc_and_inf_check.R**: This script was
+  written to be run as part of a cluster job that would operate on each decade
+  of data in parallel, but can be run locally by setting the `NAI` parameter at
+  the top of the file to a value between 1 and 5, corresponding to the five
+  decades between 1970 and 2010, or by supplying the value as a trailing
+  argument if running the script from the command line. For each decade, this 
+  script creates 10 imputed datasets, and saves a file containing each of 10 
+  iterations along the way so that not all progress is lost if the script is 
+  interrupted, in the subdirectory "1_imp_iterations". If the script is 
+  interrupted, you can simply run it again and it will pick up where it left 
+  off. THe final imputation results will all be contained in 
+  "imp_YEAR_10.Rdata", the file for the 10th iteration.
+  The script also creates diagnostic output in the "output" subdirectory, and 
+  in the case of an execution error, saves degugging information in the 
+  "1_error_dump" subdirectory.
+  This is a memory- and computationally-intensive step in the 
+  analysis. Creating the 10 imputed datasets for 1970, which has the fewest 
+  observations and the least amount of missingness, required about 6 GB of RAM 
+  and took around 25 hours. Creating the imputed datasets for 2010 required
+  about 14 GB of RAM and took over two weeks. 
+  This long run time is mostly due to our use of a 
+  two-stage imputation process for variables with a high rate of zero values 
+  (which includes many of our income variables), where the first stage is a 
+  computationally-intensive logistic regression.
+* **2_assess_extreme_imputed_values.R**: Creates five files with filenames of 
+  the form "2_extreme_values_YEAR.csv", which contain information on extreme 
+  values imputed for topcoded values of income component variables. This output
+  was used to help set an upper threshold for imputed values, which is 
+  implemented in the next script.
+* **3_enforce_upper_thresholds_on_imputed_values.R**: This script compresses 
+  the distribution of imputed, topcoded income component values for variables 
+  with extreme imputed values so that all such values fall below a defined 
+  threshold. It produces five files with filenames of the form 
+  "3_imp_YEAR_10_extreme_values_transposed.Rdata", as well as diagnostic files
+  of the form "3_extreme_values_transposition_report_YEAR.csv".
+  
+### main/4a_estimate_taxes_and_transfers_imputed
+
+* **1_prepare_taxsim_input_files.R**: Creates subdirectory "1_taxsim_input" and 
+  files in that subdirectory for each imputed dataset for each decade, with 
+  filenames of the form "srYEAR_IMPNUM" (e.g., "sr1970_1").
+* **2_check_dependent_counts.R**: This script checks for a particular problem 
+  we encountered on early TAXSIM runs to make sure that our fix worked. It 
+  produces no output. Instead, it prints a message to the console indicating 
+  whether the problem is fixed.
+* **3_upload_taxsim_input.R**: This script uploads the files created in step 1 
+  to the TAXSIM ftp server at taxsimftp.nber.org. If the script isn't working 
+  for unclear reasons, make sure your firewall settings allow ftp see 
+  <http://users.nber.org/~taxsim/ftp-problems.html>.
+  Also, for more info on the TAXSIM ftp service, see 
+  <https://users.nber.org/~taxsim/taxsim9/taxsim-ftp.html>.
+* **4_download_taxsim_output.R**: This script downloads the TAXSIM output, 
+  saving the output files in the "4_taxsim_output" directory. The TAXSIM 
+  calculations are performed during file download, so this script can be run 
+  immediately after your input files are uploaded. Note that the TAXSIM ftp 
+  server deletes old files daily, so this script must be run within one day of 
+  uploading a given file.
+* **5_check_taxsim_input_output.r**: This script simply checks that all the 
+  TAXSIM output files have the same number of lines as the corresponding input 
+  files.
+* **6_label_taxsim_output_and_merge_imputed.r**: This script creates five 
+  output files, one for each decade, with filenames of the form 
+  "6_imp_post_tax_YEAR.Rdata".
+  
+### main/4b_estimate_taxes_and_transfers_non_imputed
+
+* **1_prepare_taxsim_input_files.R**: Creates subdirectory "1_taxsim_input" and 
+  one output file ("sr1970_2010") containing all the TAXSIM input information.
+* **2_check_dependent_counts.R**: This script checks for a particular problem 
+  we encountered on early TAXSIM runs to make sure that our fix worked. It 
+  produces no output. Instead, it prints a message to the console indicating 
+  whether the problem is fixed.
+* **3_upload_taxsim_input.R**: This script uploads the file created in step 1 
+  to the TAXSIM ftp server at taxsimftp.nber.org. If the script isn't working 
+  for unclear reasons, make sure your firewall settings allow ftp see 
+  <http://users.nber.org/~taxsim/ftp-problems.html>.
+  Also, for more info on the TAXSIM ftp service, see 
+  <https://users.nber.org/~taxsim/taxsim9/taxsim-ftp.html>.
+* **4_download_taxsim_output.R**: This script downloads the TAXSIM output, 
+  saving the output file in the "4_taxsim_output" directory. The TAXSIM 
+  calculations are performed during file download, so this script can be run 
+  immediately after your input files are uploaded. Note that the TAXSIM ftp 
+  server deletes old files daily, so this script must be run within one day of 
+  uploading a given file.
+* **5_check_taxsim_input_output.r**: This script simply checks that all the 
+  TAXSIM output files have the same number of lines as the corresponding input 
+  files.
+* **6_label_taxsim_output_and_merge_non_imputed.r**: This script creates the 
+  file "6_non_imp_data_post_tax.Rdata".
+  
+### main/5_make_no_cohab_datasets
+
+* **1_make_no_cohab_datasets.R**: This script creates five output files, one 
+  for each decade of imputed data, with filenames of the form 
+  "1_imp_YEAR_post_tax_no_cohab.Rdata".
+  
+### main/6a_make_analysis_dataset_imputed
+
+* **1_make_analysis_dataset_imputed.R**: This script creates five output files, 
+  one for each decade of imputed data, with filenames of the form 
+  "1_imps_1970_analysis_vars.Rdata".
+  
+### main/6b_make_analysis_dataset_non_imputed
+
+* **1_make_analysis_dataset_non_imputed.R**: This script creates one output file
+  named "1_non_imputed_analysis_vars.Rdata".
+  
+### main/6c_make_analysis_dataset_no_cohab
+
+* **1_make_analysis_dataset_no_cohab.R**: This script creates five output files, 
+  one for each decade of imputed data, with filenames of the form 
+  "1_imps_1970_analysis_vars.Rdata".
+  
+### main/7_make_exclusion_flags
+
+* **1_make_top_two_pct_flags.R**: This script creates two output files named  
+  "1_top_2_pct_flag_non_imp.Rdata" and "1_top_2_pct_flag_imp.Rdata".
+
+* **2_make_exclude_alloc_flag.R**: This script creates one output file named 
+  "2_exclude_alloc_flag.Rdata".
+  
+### main/8a_perform_decomposition_imputed
+
+* **1_make_decomp_component_tables.R**: This script allows you to adjust some 
+  options by setting the following variables near the top of the file:
+    * `fam_adj`: Should family income be adjusted for family size?
+    * `exclude_alloc`: Should all cases where the focal person's or their 
+      spouse's labor earnings were allocated or imputed be excluded from the 
+      analysis?
+    * `exclude_top_2_pct`: Should all families in the top 2% of family income 
+      be excluded from the analysis?
+    * `exclude_top_decile_female_earners`: Should all families containing a top 
+      decile female earner be excluded?
+    * `exclude_top_decile_male_earners`: Should all families containing a top 
+      decile male earner be excluded?
+  In our main analysis results, only `fam_adj` is set to `TRUE`. All other 
+  options were only used for sensitivity analyses. This script produces ten 
+  output files, one for each imputed dataset, in the subdirectory 
+  "1_decomp_component_tables", with filenames of the form 
+  "decomp_components_imputed_SUFFIX_IMPNUM.csv", where SUFFIX indicates the 
+  options that were set to `TRUE`.
+* **2_make_qois_for_tables_and_figs.R**: This script allows you to adjust the 
+  same options described above, and produces five output files in the 
+  "2_qois_for_tables_and_figs" subdirectory, with filenames of the form 
+  "qoi_imp_YEAR_SUFFIX.Rdata".
+* **3_make_figures_1_2_and_3.R**: This script allows you to adjust the same 
+  options described above, and produces three output files in the 
+  "3_figures_1_2_and_3" directory, with filenames 
+  "figure_1_SUFFIX.csv", "figure_2_SUFFIX.csv", and "figure_3_SUFFIX.csv".
+
+### main/8b_perform_decomposition_non_imputed
+
+* **1_make_decomp_component_tables.R**: This script allows you to adjust the
+  options described above, and produces one output file, in the subdirectory 
+  "1_decomp_component_tables", with filename
+  "decomp_components_non_imputed_SUFFIX.csv", where SUFFIX indicates the 
+  options that were set to `TRUE`.
+* **2_make_qois_for_tables_and_figs.R**: This script allows you to adjust the 
+  same options described above, and produces five output files in the 
+  "2_qois_for_tables_and_figs" subdirectory, with filenames of the form 
+  "qoi_non_imp_YEAR_SUFFIX.Rdata".
+* **3_make_figures_1_2_and_3.R**: This script allows you to adjust the same 
+  options described above, and produces three output files in the 
+  "3_figures_1_2_and_3" directory, with filenames 
+  "figure_1_SUFFIX.csv", "figure_2_SUFFIX.csv", and "figure_3_SUFFIX.csv".
+
+### main/8c_perform_decomposition_no_cohab
+
+* **1_make_decomp_component_tables.R**: This script allows you to adjust the
+  options described above, and produces ten 
+  output files, one for each imputed dataset, in the subdirectory 
+  "1_decomp_component_tables", with filenames of the form 
+  "decomp_components_imputed_SUFFIX_IMPNUM.csv", where SUFFIX indicates the 
+  options that were set to `TRUE`.
+* **2_make_qois_for_tables_and_figs.R**: This script allows you to adjust the 
+  same options described above, and produces five output files in the 
+  "2_qois_for_tables_and_figs" subdirectory, with filenames of the form 
+  "qoi_imp_YEAR_SUFFIX.Rdata".
+* **3_make_figures_1_2_and_3.R**: This script allows you to adjust the same 
+  options described above, and produces three output files in the 
+  "3_figures_1_2_and_3" directory, with filenames 
+  "figure_1_SUFFIX.csv", "figure_2_SUFFIX.csv", and "figure_3_SUFFIX.csv".
+  
+### main/9_make_tables
+
+* **1_make_tables.R**: This script allows you to adjust the 
+  same options described above, and produces one output file, 
+  "1_tabs_list.Rdata", which contains the figures contained in all tables in the 
+  paper.
+
+* **2_bootstrap_loop_tables.R**: This script allows you to adjust the 
+  same options described above, and produces two output files, 
+  "2_all_bootstrap_decomp_tables.Rdata" and "2_tabs_list.Rdata". The file 
+  "2_all_bootstrap_decomp_tables.Rdata" just contains intermediate output in 
+  case the script hits an error or is interrupted. The file "2_tabs_list.Rdata" 
+  contains the figures needed to compute bootstrapped uncertainty intervals for
+  all tables in the paper
