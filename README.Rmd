@@ -24,8 +24,7 @@ here with the permission of IPUMS.
 
 Sarah Flood, Miriam King, Steven Ruggles, and J. Robert Warren. Integrated
 Public Use Microdata Series, Current Population Survey: Version 5.0 [dataset].
-Minneapolis, MN: University of Minnesota, 2017. https://doi.org/10.18128/
-D030.V5.0
+Minneapolis, MN: University of Minnesota, 2017. https://doi.org/10.18128/D030.V5.0
 
 The file "cps_master.Rdata" was created by loading an IPUMS extract downloaded 
 as a .dta file into R using the **foreign** package, and saving it to an .Rdata 
@@ -149,7 +148,7 @@ chained equations in R." Journal of statistical software (2010): 1-68.
   iterations along the way so that not all progress is lost if the script is 
   interrupted, in the subdirectory "1_imp_iterations". If the script is 
   interrupted, you can simply run it again and it will pick up where it left 
-  off. THe final imputation results will all be contained in 
+  off. The final imputation results will all be contained in 
   "imp_YEAR_10.Rdata", the file for the 10th iteration.
   The script also creates diagnostic output in the "output" subdirectory, and 
   in the case of an execution error, saves degugging information in the 
